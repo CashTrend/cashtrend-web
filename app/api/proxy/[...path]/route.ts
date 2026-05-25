@@ -11,8 +11,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = 'edge'
-
 const FORWARDED_HEADERS = ['authorization', 'content-type', 'accept']
 
 function buildBackendUrl(path: string[], search: string): string {
