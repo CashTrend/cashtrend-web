@@ -21,6 +21,8 @@
 import { useState, useEffect, useRef, useId } from 'react'
 import { Search, Loader2, X } from 'lucide-react'
 import { searchTickers } from '@/services/tickers.service'
+import { useLocale } from '@/context/locale-context'
+import { interpolate } from '@/lib/i18n/types'
 import { cn } from '@/lib/utils'
 import type { Ticker } from '@/lib/types'
 
@@ -36,7 +38,7 @@ interface TickerAutocompleteProps {
   /** Whether the field is disabled. */
   disabled?: boolean
   className?: string
-  /** Label text for the search input (used for accessibility). */
+  /** Label text for the search input (used for accessibility). Defaults to translated value. */
   label?: string
 }
 
@@ -47,8 +49,9 @@ export function TickerAutocomplete({
   error,
   disabled,
   className,
-  label = 'Search ticker',
+  label,
 }: TickerAutocompleteProps) {
+  const { t } = useLocale()
   const inputId = useId()
   const listId = useId()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -58,6 +61,8 @@ export function TickerAutocomplete({
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
+
+  const resolvedLabel = label ?? t.tickers.autocomplete_label
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -70,29 +75,31 @@ export function TickerAutocomplete({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Debounced search — all setState calls happen inside the async setTimeout callback
-  // to satisfy react-hooks/set-state-in-effect (no synchronous setState in effect body)
+  // Debounced search
   useEffect(() => {
     const trimmed = query.trim()
 
-    const timer = setTimeout(async () => {
-      if (trimmed.length === 0) {
-        setResults([])
-        setIsOpen(false)
-        return
-      }
-      setIsLoading(true)
-      try {
-        const data = await searchTickers(trimmed)
-        setResults(data)
-        setIsOpen(true)
-        setActiveIndex(-1)
-      } catch {
-        setResults([])
-      } finally {
-        setIsLoading(false)
-      }
-    }, trimmed.length === 0 ? 0 : 300)
+    const timer = setTimeout(
+      async () => {
+        if (trimmed.length === 0) {
+          setResults([])
+          setIsOpen(false)
+          return
+        }
+        setIsLoading(true)
+        try {
+          const data = await searchTickers(trimmed)
+          setResults(data)
+          setIsOpen(true)
+          setActiveIndex(-1)
+        } catch {
+          setResults([])
+        } finally {
+          setIsLoading(false)
+        }
+      },
+      trimmed.length === 0 ? 0 : 300
+    )
 
     return () => clearTimeout(timer)
   }, [query])
@@ -140,7 +147,7 @@ export function TickerAutocomplete({
               <button
                 type="button"
                 onClick={handleClear}
-                aria-label={`Remove ${value}`}
+                aria-label={interpolate(t.tickers.autocomplete_remove, { symbol: value ?? '' })}
                 className="ml-0.5 rounded hover:text-brand-hover"
               >
                 <X size={12} aria-hidden="true" />
@@ -153,7 +160,9 @@ export function TickerAutocomplete({
       {/* Search input */}
       {!hasValue && (
         <div className="relative">
-          <label htmlFor={inputId} className="sr-only">{label}</label>
+          <label htmlFor={inputId} className="sr-only">
+            {resolvedLabel}
+          </label>
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
             {isLoading ? (
               <Loader2 size={14} className="animate-spin" aria-hidden="true" />
@@ -173,7 +182,7 @@ export function TickerAutocomplete({
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={disabled}
-            placeholder="Search symbol or company…"
+            placeholder={t.tickers.autocomplete_placeholder}
             autoComplete="off"
             className={cn(
               'w-full rounded-lg border py-2 pl-9 pr-3 text-sm outline-none transition-colors',
@@ -200,7 +209,9 @@ export function TickerAutocomplete({
           )}
         >
           {results.length === 0 ? (
-            <li role="option" aria-selected={false} className="px-3 py-2 text-sm text-text-muted">No results found.</li>
+            <li role="option" aria-selected={false} className="px-3 py-2 text-sm text-text-muted">
+              {t.tickers.autocomplete_no_results}
+            </li>
           ) : (
             results.map((ticker, i) => (
               <li

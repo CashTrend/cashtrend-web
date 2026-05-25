@@ -32,9 +32,7 @@ const USER_COOKIE_NAME = 'cashtrend_user'
  */
 function readUserFromCookie(): User | null {
   try {
-    const match = document.cookie
-      .split('; ')
-      .find((c) => c.startsWith(`${USER_COOKIE_NAME}=`))
+    const match = document.cookie.split('; ').find((c) => c.startsWith(`${USER_COOKIE_NAME}=`))
     if (!match) return null
     const json = decodeURIComponent(match.slice(USER_COOKIE_NAME.length + 1))
     return JSON.parse(json) as User

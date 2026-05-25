@@ -19,6 +19,7 @@ import { useEffect, useState, useRef } from 'react'
 import { BarChart2, TrendingUp, DollarSign, RefreshCw, AlertCircle } from 'lucide-react'
 import { getSummary } from '@/services/portfolio.service'
 import { useAuth } from '@/context/auth-context'
+import { useLocale } from '@/context/locale-context'
 import { SummaryCard } from '@/components/dashboard/SummaryCard'
 import { LiquidityCard } from '@/components/dashboard/LiquidityCard'
 import { HoldingsTable } from '@/components/dashboard/HoldingsTable'
@@ -42,7 +43,7 @@ async function loadSummary(
     const data = await getSummary()
     setSummary(data)
   } catch {
-    setError('Could not load portfolio data. Make sure the backend is running.')
+    setError('error')
   } finally {
     setLoading(false)
   }
@@ -50,6 +51,7 @@ async function loadSummary(
 
 export default function DashboardPage() {
   const { isLoading: authLoading } = useAuth()
+  const { t } = useLocale()
   const [summary, setSummary] = useState<PortfolioSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -60,7 +62,8 @@ export default function DashboardPage() {
   const setLoadingRef = useRef(setLoading)
 
   // Exposed retry handler for the error state button
-  const handleRetry = () => loadSummary(setSummaryRef.current, setErrorRef.current, setLoadingRef.current)
+  const handleRetry = () =>
+    loadSummary(setSummaryRef.current, setErrorRef.current, setLoadingRef.current)
 
   // Wait for auth hydration before fetching (token must be in memory first)
   useEffect(() => {
@@ -70,7 +73,7 @@ export default function DashboardPage() {
 
   // ── Loading state ──
   if (loading || authLoading) {
-    return <DashboardSkeleton />
+    return <DashboardSkeleton label={t.dashboard.loading} />
   }
 
   // ── Error state ──
@@ -78,13 +81,15 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
         <AlertCircle size={36} className="text-loss" aria-hidden="true" />
-        <p className="text-sm font-medium text-text-primary">{error}</p>
+        <p className="text-sm font-medium text-text-primary">
+          {t.dashboard.error} {t.ui.error_backend}
+        </p>
         <button
           onClick={handleRetry}
           className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover transition-colors"
         >
           <RefreshCw size={14} aria-hidden="true" />
-          Retry
+          {t.ui.retry}
         </button>
       </div>
     )
@@ -95,10 +100,10 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* ── KPI row ── */}
-      <section aria-label="Portfolio summary">
+      <section aria-label={t.dashboard.portfolio_summary}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <SummaryCard
-            label="Portfolio Value"
+            label={t.dashboard.portfolio_value}
             value={formatCurrency(summary.total_current_value)}
             icon={<BarChart2 size={14} aria-hidden="true" />}
             badge={
@@ -108,18 +113,18 @@ export default function DashboardPage() {
                 size="sm"
               />
             }
-            description="Market value of open positions"
+            description={t.dashboard.portfolio_value_desc}
           />
 
           <SummaryCard
-            label="Total Invested"
+            label={t.dashboard.total_invested}
             value={formatCurrency(summary.total_invested)}
             icon={<DollarSign size={14} aria-hidden="true" />}
-            description="Capital deployed in open positions"
+            description={t.dashboard.total_invested_desc}
           />
 
           <SummaryCard
-            label="Unrealised P&L"
+            label={t.dashboard.unrealised_pnl}
             value={formatCurrency(summary.total_pnl_amount)}
             icon={<TrendingUp size={14} aria-hidden="true" />}
             badge={
@@ -127,7 +132,7 @@ export default function DashboardPage() {
                 <PnLBadge percent={summary.total_pnl_percent} size="sm" />
               ) : undefined
             }
-            description="Current value − total invested"
+            description={t.dashboard.unrealised_pnl_desc}
           />
 
           <LiquidityCard liquidity={summary.total_liquidity} />
@@ -135,11 +140,14 @@ export default function DashboardPage() {
       </section>
 
       {/* ── Holdings table ── */}
-      <section aria-label="Holdings">
+      <section aria-label={t.dashboard.open_positions}>
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-text-primary">Open Positions</h2>
+          <h2 className="text-sm font-semibold text-text-primary">{t.dashboard.open_positions}</h2>
           <span className="text-xs text-text-muted">
-            {summary.holdings.length} holding{summary.holdings.length !== 1 ? 's' : ''}
+            {summary.holdings.length}{' '}
+            {summary.holdings.length !== 1
+              ? t.dashboard.holding_plural
+              : t.dashboard.holding_singular}
           </span>
         </div>
         <HoldingsTable holdings={summary.holdings} />
@@ -149,9 +157,9 @@ export default function DashboardPage() {
 }
 
 /** Inline skeleton shown while data is loading. */
-function DashboardSkeleton() {
+function DashboardSkeleton({ label }: { label: string }) {
   return (
-    <div className="flex flex-col gap-6 animate-pulse" aria-busy="true" aria-label="Loading dashboard">
+    <div className="flex flex-col gap-6 animate-pulse" aria-busy="true" aria-label={label}>
       {/* KPI skeletons */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (

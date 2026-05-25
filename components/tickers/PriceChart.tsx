@@ -29,6 +29,7 @@ import {
 import Decimal from 'decimal.js'
 import { useId } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { useLocale } from '@/context/locale-context'
 import type { TickerHistoryEntry } from '@/lib/types'
 
 interface PriceChartProps {
@@ -71,18 +72,19 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 
 export function PriceChart({ entries }: PriceChartProps) {
   const gradientId = useId()
+  const { t } = useLocale()
   const data = toChartData(entries)
 
   if (data.length === 0) {
     return (
       <div className="flex h-[260px] items-center justify-center rounded-xl bg-surface-raised">
-        <p className="text-sm text-text-muted">No price history available.</p>
+        <p className="text-sm text-text-muted">{t.tickers.history.no_data}</p>
       </div>
     )
   }
 
   return (
-    <div className="h-[260px] w-full" role="img" aria-label="Price history chart">
+    <div className="h-[260px] w-full" role="img" aria-label={t.tickers.history.chart_aria}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <defs>

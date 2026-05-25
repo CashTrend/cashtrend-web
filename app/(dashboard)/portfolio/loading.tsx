@@ -1,7 +1,11 @@
 /** Loading skeleton for the Portfolio page. */
 export default function PortfolioLoading() {
   return (
-    <div className="flex flex-col gap-5 animate-pulse" aria-busy="true" aria-label="Loading portfolio">
+    <div
+      className="flex flex-col gap-5 animate-pulse"
+      aria-busy="true"
+      aria-label="Loading portfolio"
+    >
       <div className="flex items-center justify-between">
         <div className="h-4 w-24 rounded bg-surface" />
         <div className="h-8 w-36 rounded-lg bg-surface" />

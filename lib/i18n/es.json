@@ -1,0 +1,399 @@
+{
+  "ui": {
+    "app_name": "CashTrend",
+    "language_toggle_label": "EN",
+    "theme_switch_light": "Cambiar a modo claro",
+    "theme_switch_dark": "Cambiar a modo oscuro",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "no_data": "No hay datos disponibles.",
+    "error_backend": "Asegurate de que el backend est\u00e9 en ejecuci\u00f3n."
+  },
+  "nav": {
+    "dashboard": "Inicio",
+    "portfolio": "Portafolio",
+    "tickers": "Activos",
+    "sign_out": "Cerrar sesi\u00f3n",
+    "open_nav": "Abrir navegaci\u00f3n",
+    "close_nav": "Cerrar navegaci\u00f3n",
+    "main_nav": "Navegaci\u00f3n principal",
+    "sidebar": "Barra lateral",
+    "navigation": "Navegaci\u00f3n"
+  },
+  "header": {
+    "page_dashboard": "Inicio",
+    "page_portfolio": "Portafolio",
+    "page_new_transaction": "Nueva Transacci\u00f3n",
+    "page_tickers": "Activos",
+    "page_edit_transaction": "Editar Transacci\u00f3n",
+    "page_ticker_detail": "Activo",
+    "fallback": "CashTrend",
+    "signed_in_as": "Sesi\u00f3n iniciada como {{username}}"
+  },
+  "dashboard": {
+    "loading": "Cargando inicio",
+    "portfolio_summary": "Resumen del portafolio",
+    "portfolio_value": "Valor del Portafolio",
+    "portfolio_value_desc": "Valor de mercado de las posiciones abiertas",
+    "total_invested": "Total Invertido",
+    "total_invested_desc": "Capital desplegado en posiciones abiertas",
+    "unrealised_pnl": "P&L No Realizado",
+    "unrealised_pnl_desc": "Valor actual \u2212 total invertido",
+    "open_positions": "Posiciones Abiertas",
+    "holding_singular": "posici\u00f3n",
+    "holding_plural": "posiciones",
+    "error": "No se pudo cargar el portafolio."
+  },
+  "portfolio": {
+    "page_title": "Portafolio",
+    "new_transaction": "Nueva transacci\u00f3n",
+    "transaction_singular": "transacci\u00f3n",
+    "transaction_plural": "transacciones",
+    "shown_suffix": "mostradas",
+    "delete_confirm_title": "\u00bfEliminar transacci\u00f3n?",
+    "delete_confirm_body": "Esta acci\u00f3n no se puede deshacer.",
+    "delete_button": "Eliminar",
+    "error_load": "No se pudieron cargar las transacciones.",
+    "error_delete": "Error al eliminar la transacci\u00f3n. Intent\u00e1 de nuevo.",
+    "list": {
+      "empty_heading": "No se encontraron transacciones",
+      "empty_subtext": "Prob\u00e1 cambiando los filtros, o agrega una nueva transacci\u00f3n.",
+      "caption": "Historial de transacciones",
+      "col_date": "Fecha",
+      "col_type": "Tipo",
+      "col_ticker": "Activo",
+      "col_qty": "Cant.",
+      "col_price": "Precio",
+      "col_amount": "Monto",
+      "col_notes": "Notas",
+      "col_actions": "Acciones",
+      "aria_edit": "Editar transacci\u00f3n {{type}} del {{date}}",
+      "aria_delete": "Eliminar transacci\u00f3n {{type}} del {{date}}"
+    },
+    "form": {
+      "new_title": "Nueva Transacci\u00f3n",
+      "edit_title": "Editar Transacci\u00f3n",
+      "submit_create": "Crear transacci\u00f3n",
+      "submit_edit": "Guardar cambios",
+      "type_label": "Tipo de transacci\u00f3n",
+      "type_aria": "Tipo de transacci\u00f3n",
+      "type_buy": "Compra",
+      "type_sell": "Venta",
+      "type_income": "Ingreso",
+      "type_expense": "Gasto",
+      "ticker_label": "Activo",
+      "quantity_label": "Cantidad",
+      "price_label": "Precio por unidad",
+      "amount_label": "Monto",
+      "date_label": "Fecha",
+      "notes_label": "Notas",
+      "notes_placeholder": "Notas opcionales\u2026",
+      "number_placeholder": "0.00",
+      "cancel": "Cancelar",
+      "error_unexpected": "Ocurri\u00f3 un error inesperado.",
+      "error_save": "Error al guardar los cambios. Intent\u00e1 de nuevo.",
+      "error_create": "Error al crear la transacci\u00f3n. Intent\u00e1 de nuevo.",
+      "error_not_found": "Transacci\u00f3n no encontrada o no se pudo cargar.",
+      "error_invalid_id": "ID de transacci\u00f3n inv\u00e1lido.",
+      "validation": {
+        "required": "Requerido",
+        "positive": "Debe ser un n\u00famero positivo",
+        "ticker_required": "Seleccion\u00e1 un activo"
+      }
+    }
+  },
+  "tickers": {
+    "search_placeholder": "Buscar por s\u00edmbolo o nombre de empresa\u2026",
+    "search_aria": "Buscar activos",
+    "search_prompt": "Escrib\u00ed un s\u00edmbolo o nombre de empresa para buscar.",
+    "search_error": "Error en la b\u00fasqueda. Revis\u00e1 tu conexi\u00f3n y volvelo a intentar.",
+    "search_no_results": "Sin resultados para \u201c{{query}}\u201d.",
+    "autocomplete_label": "Buscar activo",
+    "autocomplete_placeholder": "Buscar s\u00edmbolo o empresa\u2026",
+    "autocomplete_remove": "Quitar {{symbol}}",
+    "autocomplete_no_results": "No se encontraron resultados.",
+    "error_load": "No se pudo cargar la informaci\u00f3n del activo.",
+    "tabs": {
+      "ratios": "Ratios",
+      "history": "Historial",
+      "income": "Resultados",
+      "balance": "Balance",
+      "cashflow": "Flujo de Caja",
+      "aria": "Pesta\u00f1as de informaci\u00f3n del activo"
+    },
+    "ratios": {
+      "no_data": "No hay datos de ratios disponibles.",
+      "section_valuation": "Valuaci\u00f3n",
+      "section_profitability": "Rentabilidad",
+      "section_cashflow": "Flujo de Caja",
+      "section_dividends": "Dividendos",
+      "beta": "Beta",
+      "pe_trailing": "P/E (Hist\u00f3rico)",
+      "pe_forward": "P/E (Esperado)",
+      "eps_trailing": "BPA (Hist\u00f3rico)",
+      "eps_forward": "BPA (Esperado)",
+      "peg": "Ratio PEG",
+      "ps": "Ratio P/V",
+      "pb": "Ratio P/VL",
+      "ev_revenue": "EV / Ingresos",
+      "ev_ebitda": "EV / EBITDA",
+      "gross_margin": "Margen Bruto",
+      "operating_margin": "Margen Operativo",
+      "ebitda_margin": "Margen EBITDA",
+      "net_margin": "Margen Neto",
+      "roa": "ROA",
+      "roe": "ROE",
+      "leverage": "Ratio de Apalancamiento",
+      "op_cashflow": "Flujo de Caja Operativo",
+      "free_cashflow": "Flujo de Caja Libre",
+      "dividend_yield": "Rendimiento por Dividendo",
+      "dividend_date": "Fecha de Dividendo",
+      "ex_dividend_date": "Fecha Ex-Dividendo"
+    },
+    "history": {
+      "no_data": "No hay historial de precios disponible.",
+      "error": "No se pudo cargar el historial de precios.",
+      "granularity_aria": "Granularidad temporal",
+      "granularity_all": "Todo",
+      "show_label": "Mostrar",
+      "per_page": "por p\u00e1gina",
+      "entries_per_page_aria": "Entradas por p\u00e1gina",
+      "caption": "Historial de precios de {{symbol}}",
+      "col_date": "Fecha",
+      "col_open": "Apertura",
+      "col_high": "M\u00e1ximo",
+      "col_low": "M\u00ednimo",
+      "col_close": "Cierre",
+      "col_dividend": "Dividendo",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "page_info": "P\u00e1gina {{page}} de {{total}} \u00b7 {{count}} {{unit}}",
+      "unit_days": "d\u00edas",
+      "unit_weeks": "semanas",
+      "unit_months": "meses",
+      "unit_years": "a\u00f1os",
+      "unit_entries": "entradas",
+      "chart_aria": "Gr\u00e1fico del historial de precios"
+    },
+    "income": {
+      "title": "Estado de Resultados",
+      "no_data": "No hay datos del estado de resultados disponibles.",
+      "col_revenue": "Ingresos",
+      "col_gross_profit": "Ganancia Bruta",
+      "col_operating_profit": "Ganancia Operativa",
+      "col_ebit": "EBIT",
+      "col_ebitda": "EBITDA",
+      "col_net_profit": "Ganancia Neta"
+    },
+    "balance": {
+      "title": "Balance General",
+      "no_data": "No hay datos del balance disponibles.",
+      "col_current_assets": "Activos Corrientes",
+      "col_noncurrent_assets": "Activos No Corrientes",
+      "col_current_liabilities": "Pasivos Corrientes",
+      "col_noncurrent_liabilities": "Pasivos No Corrientes",
+      "col_equity": "Patrimonio Neto"
+    },
+    "cashflow": {
+      "title": "Estado de Flujo de Caja",
+      "no_data": "No hay datos de flujo de caja disponibles.",
+      "col_operating": "Operativo",
+      "col_investing": "Inversi\u00f3n",
+      "col_financing": "Financiamiento"
+    },
+    "financials": {
+      "col_year": "A\u00f1o",
+      "no_data": "No hay datos disponibles."
+    }
+  },
+  "glossary": {
+    "ratios": {
+      "beta": {
+        "label": "Beta",
+        "summary": "Mide la volatilidad de la acci\u00f3n en relaci\u00f3n al mercado.",
+        "detail": "Un Beta de 1 significa que la acci\u00f3n se mueve en l\u00ednea con el mercado. Por encima de 1 indica mayor volatilidad; por debajo de 1, menor. Un Beta negativo significa que tiende a moverse en sentido opuesto al mercado."
+      },
+      "pe_trailing": {
+        "label": "P/E (Hist\u00f3rico)",
+        "summary": "Precio dividido por las ganancias por acci\u00f3n de los \u00faltimos 12 meses.",
+        "detail": "El P/E hist\u00f3rico usa ganancias reales reportadas. Un ratio m\u00e1s alto sugiere que los inversores esperan crecimiento futuro; uno m\u00e1s bajo puede indicar subvaluaci\u00f3n o menores expectativas de crecimiento."
+      },
+      "pe_forward": {
+        "label": "P/E (Esperado)",
+        "summary": "Precio dividido por las ganancias estimadas por acci\u00f3n para los pr\u00f3ximos 12 meses.",
+        "detail": "Usa pron\u00f3sticos de analistas en lugar de ganancias reportadas. El P/E esperado es \u00fatil para comparar la valuaci\u00f3n actual de una empresa con su desempe\u00f1o proyectado."
+      },
+      "eps_trailing": {
+        "label": "BPA (Hist\u00f3rico)",
+        "summary": "Ganancia neta por acci\u00f3n en los \u00faltimos 12 meses.",
+        "detail": "El BPA (Beneficio Por Acci\u00f3n) es la utilidad neta dividida por las acciones diluidas en circulaci\u00f3n. El BPA hist\u00f3rico se basa en cifras reportadas; un BPA creciente generalmente indica mejora en la rentabilidad."
+      },
+      "eps_forward": {
+        "label": "BPA (Esperado)",
+        "summary": "Ganancia neta estimada por acci\u00f3n para los pr\u00f3ximos 12 meses.",
+        "detail": "El BPA esperado depende del consenso de analistas. Muestra hacia d\u00f3nde espera el mercado que vayan las ganancias, \u00fatil para comparaciones de valuaci\u00f3n orientadas al crecimiento."
+      },
+      "peg": {
+        "label": "Ratio PEG",
+        "summary": "Ratio P/E dividido por la tasa de crecimiento de las ganancias.",
+        "detail": "Un PEG por debajo de 1 suele considerarse subvaluado en relaci\u00f3n al crecimiento; por encima de 1 puede estar sobrevaluado. Ajusta el P/E por el crecimiento esperado, dando una imagen de valuaci\u00f3n m\u00e1s completa."
+      },
+      "ps": {
+        "label": "Ratio P/V",
+        "summary": "Precio dividido por los ingresos por acci\u00f3n.",
+        "detail": "El Precio/Ventas es \u00fatil para valuar empresas sin ganancias todav\u00eda. Un P/V bajo respecto a sus pares puede indicar subvaluaci\u00f3n, pero el contexto de rentabilidad sigue siendo importante."
+      },
+      "pb": {
+        "label": "Ratio P/VL",
+        "summary": "Precio dividido por el valor libros por acci\u00f3n.",
+        "detail": "El Precio/Valor Libros compara el valor de mercado con los activos netos. Valores por debajo de 1 pueden indicar que la acci\u00f3n cotiza por debajo de su valor en libros. Com\u00fan en el an\u00e1lisis del sector financiero."
+      },
+      "ev_revenue": {
+        "label": "EV / Ingresos",
+        "summary": "Valor Empresarial dividido por los ingresos totales.",
+        "detail": "EV/Ingresos muestra cu\u00e1nto pagan los inversores por cada d\u00f3lar de ingresos, teniendo en cuenta la deuda y el efectivo. \u00datil para comparar empresas con distintas estructuras de capital."
+      },
+      "ev_ebitda": {
+        "label": "EV / EBITDA",
+        "summary": "Valor Empresarial dividido por el EBITDA.",
+        "detail": "Uno de los m\u00faltiplos de valuaci\u00f3n m\u00e1s populares. Elimina diferencias contables (depreciaci\u00f3n, impuestos, intereses) para comparar la rentabilidad operativa entre empresas y sectores."
+      },
+      "gross_margin": {
+        "label": "Margen Bruto",
+        "summary": "Porcentaje de ingresos que queda despu\u00e9s del costo de ventas.",
+        "detail": "Margen Bruto = (Ingresos \u2212 CMV) / Ingresos. M\u00e1rgenes m\u00e1s altos indican mayor poder de fijaci\u00f3n de precios o menores costos de producci\u00f3n. Var\u00eda significativamente seg\u00fan la industria."
+      },
+      "operating_margin": {
+        "label": "Margen Operativo",
+        "summary": "Porcentaje de ingresos que queda despu\u00e9s de los gastos operativos.",
+        "detail": "Margen Operativo = Ganancia Operativa / Ingresos. Mide la rentabilidad central del negocio antes de intereses e impuestos. Una tendencia creciente suele indicar mejora en la eficiencia."
+      },
+      "ebitda_margin": {
+        "label": "Margen EBITDA",
+        "summary": "EBITDA como porcentaje de los ingresos.",
+        "detail": "Margen EBITDA = EBITDA / Ingresos. Se usa para evaluar la capacidad de generaci\u00f3n de caja independientemente de la estructura de capital y las pol\u00edticas contables. Ampliamente usado en an\u00e1lisis de compras apalancadas."
+      },
+      "net_margin": {
+        "label": "Margen Neto",
+        "summary": "Porcentaje de los ingresos que se convierte en ganancia neta.",
+        "detail": "Margen Neto = Utilidad Neta / Ingresos. La m\u00e9trica de rentabilidad final despu\u00e9s de todos los gastos, impuestos e intereses. Muy variable entre industrias."
+      },
+      "roa": {
+        "label": "ROA",
+        "summary": "Retorno sobre Activos \u2014 utilidad neta dividida por los activos totales.",
+        "detail": "El ROA mide cu\u00e1n eficientemente la gerencia utiliza su base de activos para generar ganancias. Un valor mayor es mejor; las industrias intensivas en activos (manufactura, banca) tienden a tener ROA m\u00e1s bajos."
+      },
+      "roe": {
+        "label": "ROE",
+        "summary": "Retorno sobre el Patrimonio \u2014 utilidad neta dividida por el patrimonio de los accionistas.",
+        "detail": "El ROE muestra cu\u00e1nta ganancia se genera por cada d\u00f3lar de capital. Un ROE consistentemente alto puede indicar una ventaja competitiva, aunque valores muy altos tambi\u00e9n pueden reflejar alto endeudamiento."
+      },
+      "leverage": {
+        "label": "Ratio de Apalancamiento",
+        "summary": "Activos totales divididos por el patrimonio de los accionistas.",
+        "detail": "Tambi\u00e9n llamado multiplicador de capital. Un ratio de apalancamiento m\u00e1s alto significa que m\u00e1s activos se financian con deuda en lugar de patrimonio, amplificando tanto los retornos como el riesgo."
+      },
+      "op_cashflow": {
+        "label": "Flujo de Caja Operativo",
+        "summary": "Efectivo generado por las operaciones centrales del negocio.",
+        "detail": "El FCO (Flujo de Caja Operativo) es el efectivo real que genera una empresa de sus actividades principales, antes de invertir o financiar. Un FCO positivo es se\u00f1al de un negocio financieramente saludable."
+      },
+      "free_cashflow": {
+        "label": "Flujo de Caja Libre",
+        "summary": "Flujo de caja operativo menos el gasto de capital.",
+        "detail": "El FCL representa el efectivo disponible despu\u00e9s de mantener y expandir la base de activos. Las empresas con FCL consistentemente positivo pueden reinvertir en crecimiento, pagar dividendos o reducir deuda."
+      },
+      "dividend_yield": {
+        "label": "Rendimiento por Dividendo",
+        "summary": "Dividendo anual por acci\u00f3n dividido por el precio de la acci\u00f3n.",
+        "detail": "Expresado como porcentaje, el rendimiento por dividendo muestra cu\u00e1nto ingreso obtiene un inversor por cada d\u00f3lar invertido. Un rendimiento alto puede indicar valor \u2014 o, si es inusualmente alto, dificultades financieras."
+      },
+      "dividend_date": {
+        "label": "Fecha de Dividendo",
+        "summary": "Fecha en que se distribuye el pago del dividendo a los accionistas.",
+        "detail": "Tambi\u00e9n llamada fecha de pago. Los inversores que ten\u00edan la acci\u00f3n antes de la fecha ex-dividendo reciben este pago en la fecha de dividendo."
+      },
+      "ex_dividend_date": {
+        "label": "Fecha Ex-Dividendo",
+        "summary": "Fecha l\u00edmite para ser elegible al pr\u00f3ximo dividendo.",
+        "detail": "Deb\u00e9s poseer la acci\u00f3n antes de la fecha ex-dividendo para recibir el dividendo declarado. En esa fecha, el precio de la acci\u00f3n suele caer aproximadamente en el monto del dividendo."
+      }
+    },
+    "income": {
+      "revenue": {
+        "label": "Ingresos",
+        "summary": "Ingresos totales de las actividades principales de la empresa.",
+        "detail": "Tambi\u00e9n llamado l\u00ednea superior. Los ingresos se reconocen antes de deducir cualquier costo. Un crecimiento sostenido de ingresos es un indicador clave de expansi\u00f3n del negocio."
+      },
+      "gross_profit": {
+        "label": "Ganancia Bruta",
+        "summary": "Ingresos menos el costo de ventas.",
+        "detail": "La ganancia bruta muestra cu\u00e1n eficientemente una empresa produce sus bienes o servicios. Es el punto de partida para calcular la rentabilidad operativa y neta."
+      },
+      "operating_profit": {
+        "label": "Ganancia Operativa",
+        "summary": "Ganancia de las operaciones antes de intereses e impuestos.",
+        "detail": "Tambi\u00e9n llamado EBIT en algunos contextos. La ganancia operativa deduce los gastos operativos (sueldos, alquiler, depreciaci\u00f3n) de la ganancia bruta, revelando el desempe\u00f1o central del negocio."
+      },
+      "ebit": {
+        "label": "EBIT",
+        "summary": "Ganancias Antes de Intereses e Impuestos.",
+        "detail": "El EBIT mide la rentabilidad operativa sin los efectos de las decisiones de financiamiento (intereses) o las jurisdicciones fiscales. \u00datil para comparar empresas del mismo sector en diferentes pa\u00edses."
+      },
+      "ebitda": {
+        "label": "EBITDA",
+        "summary": "Ganancias Antes de Intereses, Impuestos, Depreciaci\u00f3n y Amortizaci\u00f3n.",
+        "detail": "El EBITDA es un indicador ampliamente usado como proxy de las ganancias en efectivo. Al agregar cargos no monetarios (D&A), ofrece una visi\u00f3n m\u00e1s clara de la generaci\u00f3n de caja operativa."
+      },
+      "net_profit": {
+        "label": "Ganancia Neta",
+        "summary": "La utilidad final de la empresa despu\u00e9s de todos los gastos e impuestos.",
+        "detail": "La ganancia neta (utilidad neta) es lo que queda despu\u00e9s de deducir CMV, gastos operativos, intereses e impuestos de los ingresos. Es la base para el c\u00e1lculo del BPA y el pago de dividendos."
+      }
+    },
+    "balance": {
+      "current_assets": {
+        "label": "Activos Corrientes",
+        "summary": "Activos que se espera convertir en efectivo dentro de un a\u00f1o.",
+        "detail": "Incluye efectivo, cuentas por cobrar, inventarios e inversiones de corto plazo. Mayores activos corrientes relativo a pasivos corrientes indica mayor liquidez de corto plazo."
+      },
+      "noncurrent_assets": {
+        "label": "Activos No Corrientes",
+        "summary": "Activos de largo plazo que no se espera liquidar en el a\u00f1o.",
+        "detail": "Incluye inmuebles, maquinaria y equipo (PP&E), intangibles e inversiones a largo plazo. Los activos no corrientes representan la infraestructura y las tenencias estrat\u00e9gicas de largo plazo de la empresa."
+      },
+      "current_liabilities": {
+        "label": "Pasivos Corrientes",
+        "summary": "Obligaciones con vencimiento dentro de un a\u00f1o.",
+        "detail": "Incluye cuentas por pagar, deuda de corto plazo y gastos devengados. Monitorear la relaci\u00f3n entre activos corrientes y pasivos corrientes (ratio corriente) revela la salud financiera de corto plazo."
+      },
+      "noncurrent_liabilities": {
+        "label": "Pasivos No Corrientes",
+        "summary": "Obligaciones financieras de largo plazo con vencimiento superior a un a\u00f1o.",
+        "detail": "Principalmente deuda a largo plazo, impuestos diferidos y obligaciones de pensiones. Un alto nivel de pasivos no corrientes respecto al patrimonio puede indicar un elevado apalancamiento financiero."
+      },
+      "equity": {
+        "label": "Patrimonio Neto",
+        "summary": "Patrimonio de los accionistas \u2014 activos totales menos pasivos totales.",
+        "detail": "Tambi\u00e9n llamado valor libros. El patrimonio neto representa el inter\u00e9s residual en los activos de la empresa despu\u00e9s de pagar todas las deudas. Es la medida contable del valor neto de la empresa."
+      }
+    },
+    "cashflow": {
+      "operating": {
+        "label": "Flujo de Caja Operativo",
+        "summary": "Efectivo generado o utilizado por las operaciones centrales del negocio.",
+        "detail": "Derivado del estado de resultados ajustado por partidas no monetarias y cambios en el capital de trabajo. Un flujo de caja operativo positivo y creciente es una se\u00f1al fuerte de salud empresarial."
+      },
+      "investing": {
+        "label": "Flujo de Caja de Inversi\u00f3n",
+        "summary": "Efectivo utilizado o generado por inversiones en activos.",
+        "detail": "Incluye compras y ventas de propiedades, equipos e inversiones financieras. Un flujo de caja de inversi\u00f3n consistentemente negativo suele significar que la empresa est\u00e1 reinvirtiendo fuertemente para el crecimiento futuro."
+      },
+      "financing": {
+        "label": "Flujo de Caja de Financiamiento",
+        "summary": "Flujos relacionados con deuda, capital y pagos de dividendos.",
+        "detail": "Incluye endeudamiento, repagos de pr\u00e9stamos, emisiones o recompras de acciones y dividendos pagados. Un flujo de financiamiento positivo generalmente significa que la empresa est\u00e1 captando capital; uno negativo significa que lo est\u00e1 devolviendo."
+      }
+    }
+  }
+}

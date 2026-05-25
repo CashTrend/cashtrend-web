@@ -21,7 +21,8 @@ let accessToken: string | null = null
 let isRefreshing = false
 
 /** Queue of callbacks waiting for the refreshed token. */
-let refreshSubscribers: Array<{ resolve: (token: string) => void; reject: (err: Error) => void }> = []
+let refreshSubscribers: Array<{ resolve: (token: string) => void; reject: (err: Error) => void }> =
+  []
 
 /**
  * Set the in-memory access token.

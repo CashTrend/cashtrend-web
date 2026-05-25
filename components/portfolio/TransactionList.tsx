@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * TransactionList — displays a list of transactions in a responsive table.
  *
@@ -25,6 +27,8 @@ import Link from 'next/link'
 import { Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatCurrency, formatNumber, formatDate } from '@/lib/utils'
+import { useLocale } from '@/context/locale-context'
+import { interpolate } from '@/lib/i18n/types'
 import type { Transaction, TransactionType } from '@/lib/types'
 
 interface TransactionListProps {
@@ -45,13 +49,13 @@ const TH = 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider t
 const TD = 'px-4 py-3 text-sm text-text-primary'
 
 export function TransactionList({ transactions, onDelete, isDeleting }: TransactionListProps) {
+  const { t } = useLocale()
+
   if (transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-surface py-16 text-center">
-        <p className="text-sm font-medium text-text-secondary">No transactions found</p>
-        <p className="text-xs text-text-muted">
-          Try changing your filters, or add a new transaction.
-        </p>
+        <p className="text-sm font-medium text-text-secondary">{t.portfolio.list.empty_heading}</p>
+        <p className="text-xs text-text-muted">{t.portfolio.list.empty_subtext}</p>
       </div>
     )
   }
@@ -60,17 +64,17 @@ export function TransactionList({ transactions, onDelete, isDeleting }: Transact
     <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[700px] border-collapse">
-          <caption className="sr-only">Transaction history</caption>
+          <caption className="sr-only">{t.portfolio.list.caption}</caption>
           <thead>
             <tr className="border-b border-border bg-surface-raised">
-              <th className={TH}>Date</th>
-              <th className={TH}>Type</th>
-              <th className={TH}>Ticker</th>
-              <th className={cn(TH, 'text-right')}>Qty</th>
-              <th className={cn(TH, 'text-right')}>Price</th>
-              <th className={cn(TH, 'text-right')}>Amount</th>
-              <th className={TH}>Notes</th>
-              <th className={cn(TH, 'text-right')}>Actions</th>
+              <th className={TH}>{t.portfolio.list.col_date}</th>
+              <th className={TH}>{t.portfolio.list.col_type}</th>
+              <th className={TH}>{t.portfolio.list.col_ticker}</th>
+              <th className={cn(TH, 'text-right')}>{t.portfolio.list.col_qty}</th>
+              <th className={cn(TH, 'text-right')}>{t.portfolio.list.col_price}</th>
+              <th className={cn(TH, 'text-right')}>{t.portfolio.list.col_amount}</th>
+              <th className={TH}>{t.portfolio.list.col_notes}</th>
+              <th className={cn(TH, 'text-right')}>{t.portfolio.list.col_actions}</th>
             </tr>
           </thead>
           <tbody>
@@ -135,7 +139,10 @@ export function TransactionList({ transactions, onDelete, isDeleting }: Transact
                   <div className="flex items-center justify-end gap-1">
                     <Link
                       href={`/portfolio/${tx.id}/edit`}
-                      aria-label={`Edit ${tx.transaction_type} transaction on ${formatDate(tx.date)}`}
+                      aria-label={interpolate(t.portfolio.list.aria_edit, {
+                        type: tx.transaction_type,
+                        date: formatDate(tx.date),
+                      })}
                       className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface-raised hover:text-text-primary"
                     >
                       <Pencil size={13} aria-hidden="true" />
@@ -144,7 +151,10 @@ export function TransactionList({ transactions, onDelete, isDeleting }: Transact
                       type="button"
                       onClick={() => onDelete(tx.id)}
                       disabled={isDeleting === tx.id}
-                      aria-label={`Delete ${tx.transaction_type} transaction on ${formatDate(tx.date)}`}
+                      aria-label={interpolate(t.portfolio.list.aria_delete, {
+                        type: tx.transaction_type,
+                        date: formatDate(tx.date),
+                      })}
                       className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-loss-bg hover:text-loss disabled:opacity-50"
                     >
                       <Trash2 size={13} aria-hidden="true" />

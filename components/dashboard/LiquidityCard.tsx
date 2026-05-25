@@ -26,11 +26,7 @@ export function LiquidityCard({ liquidity, className }: LiquidityCardProps) {
   const direction = getPnlDirection(liquidity)
 
   const valueColorClass =
-    direction === 'gain'
-      ? 'text-gain'
-      : direction === 'loss'
-        ? 'text-loss'
-        : 'text-text-primary'
+    direction === 'gain' ? 'text-gain' : direction === 'loss' ? 'text-loss' : 'text-text-primary'
 
   return (
     <div

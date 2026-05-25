@@ -24,62 +24,30 @@ import {
 import { RatiosTab } from '@/components/tickers/RatiosTab'
 import { HistoryTab } from '@/components/tickers/HistoryTab'
 import { FinancialsTab, type FinancialColumn } from '@/components/tickers/FinancialsTab'
+import { useLocale } from '@/context/locale-context'
+import { useAuth } from '@/context/auth-context'
 import { cn } from '@/lib/utils'
-import type {
-  TickerDetail,
-  TickerIncome,
-  TickerBalance,
-  TickerCashFlow,
-} from '@/lib/types'
+import type { TickerDetail, TickerIncome, TickerBalance, TickerCashFlow } from '@/lib/types'
 
 // ── Tab definition ─────────────────────────────────────────────────────────────
 
 type TabId = 'ratios' | 'history' | 'income' | 'balance' | 'cashflow'
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: 'ratios', label: 'Ratios' },
-  { id: 'history', label: 'History' },
-  { id: 'income', label: 'Income' },
-  { id: 'balance', label: 'Balance' },
-  { id: 'cashflow', label: 'Cash Flow' },
-]
-
-// ── Column definitions for FinancialsTab ──────────────────────────────────────
-
-const INCOME_COLUMNS: FinancialColumn<TickerIncome>[] = [
-  { label: 'Revenue', key: 'total_profit' },
-  { label: 'Gross Profit', key: 'gross_profit' },
-  { label: 'Operating Profit', key: 'operating_profit' },
-  { label: 'EBIT', key: 'ebit' },
-  { label: 'EBITDA', key: 'ebitda' },
-  { label: 'Net Profit', key: 'net_profit' },
-]
-
-const BALANCE_COLUMNS: FinancialColumn<TickerBalance>[] = [
-  { label: 'Current Assets', key: 'current_assets' },
-  { label: 'Non-Current Assets', key: 'no_current_assets' },
-  { label: 'Current Liabilities', key: 'current_liabilities' },
-  { label: 'Non-Current Liabilities', key: 'no_current_liabilities' },
-  { label: 'Net Equity', key: 'equity_net' },
-]
-
-const CASHFLOW_COLUMNS: FinancialColumn<TickerCashFlow>[] = [
-  { label: 'Operating', key: 'operating_cash_flow' },
-  { label: 'Investing', key: 'investing_cash_flow' },
-  { label: 'Financing', key: 'financing_cash_flow' },
-]
-
 // ── Page data shape ────────────────────────────────────────────────────────────
 
 interface PageData {
   detail: TickerDetail
-  income: TickerIncome[]
-  balance: TickerBalance[]
-  cashflow: TickerCashFlow[]
+  /** null = request failed or ticker has no income data (e.g. ETFs). Tab is hidden. */
+  income: TickerIncome[] | null
+  /** null = request failed or ticker has no balance sheet data. Tab is hidden. */
+  balance: TickerBalance[] | null
+  /** null = request failed or ticker has no cash flow data. Tab is hidden. */
+  cashflow: TickerCashFlow[] | null
 }
 
 async function loadAll(
   symbol: string,
+  errorMsg: string,
   setData: (d: PageData) => void,
   setError: (e: string) => void,
   setLoading: (l: boolean) => void
@@ -87,15 +55,28 @@ async function loadAll(
   setLoading(true)
   setError('')
   try {
-    const [detail, income, balance, cashflow] = await Promise.all([
+    const [detailResult, incomeResult, balanceResult, cashflowResult] = await Promise.allSettled([
       getTickerDetail(symbol),
       getTickerIncome(symbol),
       getTickerBalance(symbol),
       getTickerCashflow(symbol),
     ])
-    setData({ detail, income, balance, cashflow })
+
+    // detail is mandatory — any failure here is a fatal page error
+    if (detailResult.status === 'rejected') {
+      setError(errorMsg)
+      return
+    }
+
+    setData({
+      detail: detailResult.value,
+      // income/balance/cashflow are optional — null means not available for this ticker
+      income: incomeResult.status === 'fulfilled' ? incomeResult.value : null,
+      balance: balanceResult.status === 'fulfilled' ? balanceResult.value : null,
+      cashflow: cashflowResult.status === 'fulfilled' ? cashflowResult.value : null,
+    })
   } catch {
-    setError('Could not load ticker data. Make sure the backend is running.')
+    setError(errorMsg)
   } finally {
     setLoading(false)
   }
@@ -106,44 +87,147 @@ async function loadAll(
 export default function TickerDetailPage() {
   const params = useParams()
   const symbol = (params.symbol as string).toUpperCase()
+  const { t } = useLocale()
+  const { isLoading: authLoading } = useAuth()
 
   const [pageData, setPageData] = useState<PageData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<TabId>('ratios')
 
+  // ── Built inside component to access t ──
+  const TABS: { id: TabId; label: string }[] = [
+    { id: 'ratios', label: t.tickers.tabs.ratios },
+    { id: 'history', label: t.tickers.tabs.history },
+    { id: 'income', label: t.tickers.tabs.income },
+    { id: 'balance', label: t.tickers.tabs.balance },
+    { id: 'cashflow', label: t.tickers.tabs.cashflow },
+  ]
+
+  const INCOME_COLUMNS: FinancialColumn<TickerIncome>[] = [
+    {
+      label: t.tickers.income.col_revenue,
+      key: 'total_profit',
+      glossaryEntry: t.glossary.income.revenue,
+    },
+    {
+      label: t.tickers.income.col_gross_profit,
+      key: 'gross_profit',
+      glossaryEntry: t.glossary.income.gross_profit,
+    },
+    {
+      label: t.tickers.income.col_operating_profit,
+      key: 'operating_profit',
+      glossaryEntry: t.glossary.income.operating_profit,
+    },
+    { label: t.tickers.income.col_ebit, key: 'ebit', glossaryEntry: t.glossary.income.ebit },
+    { label: t.tickers.income.col_ebitda, key: 'ebitda', glossaryEntry: t.glossary.income.ebitda },
+    {
+      label: t.tickers.income.col_net_profit,
+      key: 'net_profit',
+      glossaryEntry: t.glossary.income.net_profit,
+    },
+  ]
+
+  const BALANCE_COLUMNS: FinancialColumn<TickerBalance>[] = [
+    {
+      label: t.tickers.balance.col_current_assets,
+      key: 'current_assets',
+      glossaryEntry: t.glossary.balance.current_assets,
+    },
+    {
+      label: t.tickers.balance.col_noncurrent_assets,
+      key: 'no_current_assets',
+      glossaryEntry: t.glossary.balance.noncurrent_assets,
+    },
+    {
+      label: t.tickers.balance.col_current_liabilities,
+      key: 'current_liabilities',
+      glossaryEntry: t.glossary.balance.current_liabilities,
+    },
+    {
+      label: t.tickers.balance.col_noncurrent_liabilities,
+      key: 'no_current_liabilities',
+      glossaryEntry: t.glossary.balance.noncurrent_liabilities,
+    },
+    {
+      label: t.tickers.balance.col_equity,
+      key: 'equity_net',
+      glossaryEntry: t.glossary.balance.equity,
+    },
+  ]
+
+  const CASHFLOW_COLUMNS: FinancialColumn<TickerCashFlow>[] = [
+    {
+      label: t.tickers.cashflow.col_operating,
+      key: 'operating_cash_flow',
+      glossaryEntry: t.glossary.cashflow.operating,
+    },
+    {
+      label: t.tickers.cashflow.col_investing,
+      key: 'investing_cash_flow',
+      glossaryEntry: t.glossary.cashflow.investing,
+    },
+    {
+      label: t.tickers.cashflow.col_financing,
+      key: 'financing_cash_flow',
+      glossaryEntry: t.glossary.cashflow.financing,
+    },
+  ]
+
   const setDataRef = useRef(setPageData)
   const setErrorRef = useRef(setError)
   const setLoadingRef = useRef(setLoading)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
-  const handleTabKeyDown = useCallback((e: React.KeyboardEvent, index: number) => {
-    let next = index
-    if (e.key === 'ArrowRight') {
-      e.preventDefault()
-      next = (index + 1) % TABS.length
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault()
-      next = (index - 1 + TABS.length) % TABS.length
-    } else if (e.key === 'Home') {
-      e.preventDefault()
-      next = 0
-    } else if (e.key === 'End') {
-      e.preventDefault()
-      next = TABS.length - 1
-    } else {
-      return
-    }
-    setActiveTab(TABS[next].id)
-    tabRefs.current[next]?.focus()
-  }, [])
+  // ── Visible tabs — hide Income/Balance/Cashflow when data is null ──
+  const visibleTabs = TABS.filter((tab) => {
+    if (tab.id === 'income') return pageData?.income !== null
+    if (tab.id === 'balance') return pageData?.balance !== null
+    if (tab.id === 'cashflow') return pageData?.cashflow !== null
+    return true
+  })
+
+  // ── Derive effective tab: fall back to 'ratios' if active tab is now hidden ──
+  const effectiveTab = visibleTabs.some((tab) => tab.id === activeTab) ? activeTab : 'ratios'
+
+  const handleTabKeyDown = useCallback(
+    (e: React.KeyboardEvent, index: number) => {
+      let next = index
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        next = (index + 1) % visibleTabs.length
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        next = (index - 1 + visibleTabs.length) % visibleTabs.length
+      } else if (e.key === 'Home') {
+        e.preventDefault()
+        next = 0
+      } else if (e.key === 'End') {
+        e.preventDefault()
+        next = visibleTabs.length - 1
+      } else {
+        return
+      }
+      setActiveTab(visibleTabs[next].id)
+      tabRefs.current[next]?.focus()
+    },
+    [visibleTabs]
+  )
 
   useEffect(() => {
-    loadAll(symbol, setDataRef.current, setErrorRef.current, setLoadingRef.current)
-  }, [symbol])
+    if (authLoading) return
+    loadAll(
+      symbol,
+      t.tickers.error_load,
+      setDataRef.current,
+      setErrorRef.current,
+      setLoadingRef.current
+    )
+  }, [authLoading, symbol, t.tickers.error_load])
 
   // ── Loading ──
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex flex-col gap-6 animate-pulse" aria-busy="true">
         <div className="flex items-start gap-4">
@@ -154,7 +238,9 @@ export default function TickerDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          {TABS.map((t) => <div key={t.id} className="h-9 w-20 rounded-lg bg-surface" />)}
+          {TABS.map((t) => (
+            <div key={t.id} className="h-9 w-20 rounded-lg bg-surface" />
+          ))}
         </div>
         <div className="h-96 rounded-xl bg-surface" />
       </div>
@@ -206,23 +292,25 @@ export default function TickerDetailPage() {
       {/* ── Tab bar ── */}
       <div
         role="tablist"
-        aria-label="Ticker information tabs"
+        aria-label={t.tickers.tabs.aria}
         className="flex flex-wrap gap-1 border-b border-border pb-0"
       >
-        {TABS.map((tab, i) => (
+        {visibleTabs.map((tab, i) => (
           <button
             key={tab.id}
-            ref={(el) => { tabRefs.current[i] = el }}
+            ref={(el) => {
+              tabRefs.current[i] = el
+            }}
             role="tab"
             id={`tab-${tab.id}`}
-            aria-selected={activeTab === tab.id}
+            aria-selected={effectiveTab === tab.id}
             aria-controls={`tabpanel-${tab.id}`}
-            tabIndex={activeTab === tab.id ? 0 : -1}
+            tabIndex={effectiveTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id)}
             onKeyDown={(e) => handleTabKeyDown(e, i)}
             className={cn(
               'rounded-t-lg px-4 py-2 text-sm font-medium transition-colors',
-              activeTab === tab.id
+              effectiveTab === tab.id
                 ? 'border-b-2 border-brand text-brand'
                 : 'text-text-secondary hover:text-text-primary'
             )}
@@ -234,35 +322,35 @@ export default function TickerDetailPage() {
 
       {/* ── Tab panels ── */}
       <div
-        id={`tabpanel-${activeTab}`}
+        id={`tabpanel-${effectiveTab}`}
         role="tabpanel"
         tabIndex={0}
-        aria-labelledby={`tab-${activeTab}`}
+        aria-labelledby={`tab-${effectiveTab}`}
       >
-        {activeTab === 'ratios' && <RatiosTab ratios={detail.tickerratios_set} />}
-        {activeTab === 'history' && <HistoryTab symbol={symbol} />}
-        {activeTab === 'income' && (
+        {effectiveTab === 'ratios' && <RatiosTab ratios={detail.tickerratios_set} />}
+        {effectiveTab === 'history' && <HistoryTab symbol={symbol} />}
+        {effectiveTab === 'income' && (
           <FinancialsTab
-            title="Income Statement"
-            rows={income}
+            title={t.tickers.income.title}
+            rows={income ?? []}
             columns={INCOME_COLUMNS}
-            emptyMessage="No income statement data available."
+            emptyMessage={t.tickers.income.no_data}
           />
         )}
-        {activeTab === 'balance' && (
+        {effectiveTab === 'balance' && (
           <FinancialsTab
-            title="Balance Sheet"
-            rows={balance}
+            title={t.tickers.balance.title}
+            rows={balance ?? []}
             columns={BALANCE_COLUMNS}
-            emptyMessage="No balance sheet data available."
+            emptyMessage={t.tickers.balance.no_data}
           />
         )}
-        {activeTab === 'cashflow' && (
+        {effectiveTab === 'cashflow' && (
           <FinancialsTab
-            title="Cash Flow Statement"
-            rows={cashflow}
+            title={t.tickers.cashflow.title}
+            rows={cashflow ?? []}
             columns={CASHFLOW_COLUMNS}
-            emptyMessage="No cash flow data available."
+            emptyMessage={t.tickers.cashflow.no_data}
           />
         )}
       </div>

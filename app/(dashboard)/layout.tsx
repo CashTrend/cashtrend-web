@@ -1,4 +1,5 @@
 import { AuthProvider } from '@/context/auth-context'
+import { LocaleProvider } from '@/context/locale-context'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Header } from '@/components/layout/Header'
 
@@ -23,17 +24,19 @@ import { Header } from '@/components/layout/Header'
  */
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <div className="flex h-screen overflow-hidden bg-background">
-        {/* Sidebar — handles its own desktop/mobile rendering */}
-        <Sidebar />
+    <LocaleProvider>
+      <AuthProvider>
+        <div className="flex h-screen overflow-hidden bg-background">
+          {/* Sidebar — handles its own desktop/mobile rendering */}
+          <Sidebar />
 
-        {/* Main column */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <Header />
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+          {/* Main column */}
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <Header />
+            <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+          </div>
         </div>
-      </div>
-    </AuthProvider>
+      </AuthProvider>
+    </LocaleProvider>
   )
 }

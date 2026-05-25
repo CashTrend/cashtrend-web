@@ -31,43 +31,11 @@ import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { FormError } from '@/components/ui/FormError'
 import { TickerAutocomplete } from './TickerAutocomplete'
+import { useLocale } from '@/context/locale-context'
 import { cn } from '@/lib/utils'
 import type { CreateTransactionRequest, Transaction, TransactionType } from '@/lib/types'
 
-// ── Zod schemas ────────────────────────────────────────────────────────────────
-
-const positiveDecimal = z
-  .string()
-  .min(1, 'Required')
-  .refine((v) => !isNaN(Number(v)) && Number(v) > 0, { message: 'Must be a positive number' })
-
-const tickerSchema = z.object({
-  transaction_type: z.enum(['BUY', 'SELL']),
-  ticker: z.string().min(1, 'Select a ticker'),
-  quantity: positiveDecimal,
-  price_per_unit: positiveDecimal,
-  date: z.string().min(1, 'Required'),
-  notes: z.string().optional(),
-})
-
-const cashSchema = z.object({
-  transaction_type: z.enum(['INCOME', 'EXPENSE']),
-  amount: positiveDecimal,
-  date: z.string().min(1, 'Required'),
-  notes: z.string().optional(),
-})
-
-type TickerFormValues = z.infer<typeof tickerSchema>
-type CashFormValues = z.infer<typeof cashSchema>
-
 // ── Helpers ────────────────────────────────────────────────────────────────────
-
-const TYPE_OPTIONS: { label: string; value: TransactionType }[] = [
-  { label: 'Buy', value: 'BUY' },
-  { label: 'Sell', value: 'SELL' },
-  { label: 'Income', value: 'INCOME' },
-  { label: 'Expense', value: 'EXPENSE' },
-]
 
 type TransactionMode = 'ticker' | 'cash'
 
@@ -97,14 +65,51 @@ export function TransactionForm({
   initialValues,
   onSubmit,
   isSubmitting = false,
-  submitLabel = 'Save',
+  submitLabel,
   onCancel,
 }: TransactionFormProps) {
+  const { t } = useLocale()
+
+  // ── Zod schemas (built here to access translated messages) ──────────────────
+
+  const positiveDecimal = z
+    .string()
+    .min(1, t.portfolio.form.validation.required)
+    .refine((v) => !isNaN(Number(v)) && Number(v) > 0, {
+      message: t.portfolio.form.validation.positive,
+    })
+
+  const tickerSchema = z.object({
+    transaction_type: z.enum(['BUY', 'SELL']),
+    ticker: z.string().min(1, t.portfolio.form.validation.ticker_required),
+    quantity: positiveDecimal,
+    price_per_unit: positiveDecimal,
+    date: z.string().min(1, t.portfolio.form.validation.required),
+    notes: z.string().optional(),
+  })
+
+  const cashSchema = z.object({
+    transaction_type: z.enum(['INCOME', 'EXPENSE']),
+    amount: positiveDecimal,
+    date: z.string().min(1, t.portfolio.form.validation.required),
+    notes: z.string().optional(),
+  })
+
+  type TickerFormValues = z.infer<typeof tickerSchema>
+  type CashFormValues = z.infer<typeof cashSchema>
+
   const initialType: TransactionType = initialValues?.transaction_type ?? 'BUY'
   const [txType, setTxType] = useState<TransactionType>(initialType)
   const [formError, setFormError] = useState<string | null>(null)
 
   const mode = getMode(txType)
+
+  const TYPE_OPTIONS: { label: string; value: TransactionType }[] = [
+    { label: t.portfolio.form.type_buy, value: 'BUY' },
+    { label: t.portfolio.form.type_sell, value: 'SELL' },
+    { label: t.portfolio.form.type_income, value: 'INCOME' },
+    { label: t.portfolio.form.type_expense, value: 'EXPENSE' },
+  ]
 
   // ── Ticker form (BUY/SELL) ──
   const tickerForm = useForm<TickerFormValues>({
@@ -150,7 +155,7 @@ export function TransactionForm({
     try {
       await onSubmit(values as CreateTransactionRequest)
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'An unexpected error occurred.')
+      setFormError(err instanceof Error ? err.message : t.portfolio.form.error_unexpected)
     }
   }
 
@@ -159,15 +164,19 @@ export function TransactionForm({
     try {
       await onSubmit(values as CreateTransactionRequest)
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'An unexpected error occurred.')
+      setFormError(err instanceof Error ? err.message : t.portfolio.form.error_unexpected)
     }
   }
 
   // ── Type selector ──
   const typeSelector = (
     <div>
-      <Label>Transaction type</Label>
-      <div role="group" aria-label="Transaction type" className="mt-1.5 flex flex-wrap gap-2">
+      <Label>{t.portfolio.form.type_label}</Label>
+      <div
+        role="group"
+        aria-label={t.portfolio.form.type_aria}
+        className="mt-1.5 flex flex-wrap gap-2"
+      >
         {TYPE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
@@ -188,27 +197,32 @@ export function TransactionForm({
     </div>
   )
 
+  const resolvedSubmitLabel = submitLabel ?? t.portfolio.form.submit_create
+
   // ── Shared footer ──
   const footer = (
     <div className="flex items-center justify-end gap-3 pt-2">
       {onCancel && (
         <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          {t.portfolio.form.cancel}
         </Button>
       )}
       <Button type="submit" variant="primary" isLoading={isSubmitting} disabled={isSubmitting}>
-        {submitLabel}
+        {resolvedSubmitLabel}
       </Button>
     </div>
   )
 
   // Must be called unconditionally at the top level (Rules of Hooks)
-  // useWatch subscribes to the ticker field without triggering the incompatible-library warning
   const watchedTicker = useWatch({ control: tickerForm.control, name: 'ticker' })
 
   // ── Render: BUY / SELL ──
   if (mode === 'ticker') {
-    const { register, formState: { errors }, setValue } = tickerForm
+    const {
+      register,
+      formState: { errors },
+      setValue,
+    } = tickerForm
     return (
       <form
         onSubmit={tickerForm.handleSubmit(handleTickerSubmit)}
@@ -220,11 +234,11 @@ export function TransactionForm({
 
         {/* Ticker autocomplete */}
         <div>
-          <Label required>Ticker</Label>
+          <Label required>{t.portfolio.form.ticker_label}</Label>
           <TickerAutocomplete
             value={watchedTicker}
-            onSelect={(t) => {
-              setValue('ticker', t.symbol, { shouldValidate: true })
+            onSelect={(tk) => {
+              setValue('ticker', tk.symbol, { shouldValidate: true })
             }}
             onClear={() => setValue('ticker', '', { shouldValidate: true })}
             error={errors.ticker?.message}
@@ -235,26 +249,30 @@ export function TransactionForm({
         {/* Quantity + Price — side by side on sm+ */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="quantity" required>Quantity</Label>
+            <Label htmlFor="quantity" required>
+              {t.portfolio.form.quantity_label}
+            </Label>
             <Input
               id="quantity"
               type="number"
               step="any"
               min="0"
-              placeholder="0.00"
+              placeholder={t.portfolio.form.number_placeholder}
               {...register('quantity')}
               error={errors.quantity?.message}
               className="mt-1.5"
             />
           </div>
           <div>
-            <Label htmlFor="price_per_unit" required>Price per unit</Label>
+            <Label htmlFor="price_per_unit" required>
+              {t.portfolio.form.price_label}
+            </Label>
             <Input
               id="price_per_unit"
               type="number"
               step="any"
               min="0"
-              placeholder="0.00"
+              placeholder={t.portfolio.form.number_placeholder}
               {...register('price_per_unit')}
               error={errors.price_per_unit?.message}
               className="mt-1.5"
@@ -264,7 +282,9 @@ export function TransactionForm({
 
         {/* Date */}
         <div>
-          <Label htmlFor="ticker-date" required>Date</Label>
+          <Label htmlFor="ticker-date" required>
+            {t.portfolio.form.date_label}
+          </Label>
           <Input
             id="ticker-date"
             type="date"
@@ -276,11 +296,11 @@ export function TransactionForm({
 
         {/* Notes */}
         <div>
-          <Label htmlFor="ticker-notes">Notes</Label>
+          <Label htmlFor="ticker-notes">{t.portfolio.form.notes_label}</Label>
           <textarea
             id="ticker-notes"
             rows={2}
-            placeholder="Optional notes…"
+            placeholder={t.portfolio.form.notes_placeholder}
             {...register('notes')}
             className={cn(
               'mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm',
@@ -296,7 +316,10 @@ export function TransactionForm({
   }
 
   // ── Render: INCOME / EXPENSE ──
-  const { register, formState: { errors } } = cashForm
+  const {
+    register,
+    formState: { errors },
+  } = cashForm
   return (
     <form
       onSubmit={cashForm.handleSubmit(handleCashSubmit)}
@@ -308,13 +331,15 @@ export function TransactionForm({
 
       {/* Amount */}
       <div>
-        <Label htmlFor="amount" required>Amount</Label>
+        <Label htmlFor="amount" required>
+          {t.portfolio.form.amount_label}
+        </Label>
         <Input
           id="amount"
           type="number"
           step="any"
           min="0"
-          placeholder="0.00"
+          placeholder={t.portfolio.form.number_placeholder}
           {...register('amount')}
           error={errors.amount?.message}
           className="mt-1.5"
@@ -323,7 +348,9 @@ export function TransactionForm({
 
       {/* Date */}
       <div>
-        <Label htmlFor="cash-date" required>Date</Label>
+        <Label htmlFor="cash-date" required>
+          {t.portfolio.form.date_label}
+        </Label>
         <Input
           id="cash-date"
           type="date"
@@ -335,11 +362,11 @@ export function TransactionForm({
 
       {/* Notes */}
       <div>
-        <Label htmlFor="cash-notes">Notes</Label>
+        <Label htmlFor="cash-notes">{t.portfolio.form.notes_label}</Label>
         <textarea
           id="cash-notes"
           rows={2}
-          placeholder="Optional notes…"
+          placeholder={t.portfolio.form.notes_placeholder}
           {...register('notes')}
           className={cn(
             'mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm',

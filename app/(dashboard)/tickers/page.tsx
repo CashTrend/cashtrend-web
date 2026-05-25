@@ -14,10 +14,13 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, Loader2, TrendingUp } from 'lucide-react'
 import { searchTickers } from '@/services/tickers.service'
+import { useLocale } from '@/context/locale-context'
+import { interpolate } from '@/lib/i18n/types'
 import { cn } from '@/lib/utils'
 import type { Ticker } from '@/lib/types'
 
 export default function TickersPage() {
+  const { t } = useLocale()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Ticker[]>([])
   const [loading, setLoading] = useState(false)
@@ -27,28 +30,31 @@ export default function TickersPage() {
   useEffect(() => {
     const trimmed = query.trim()
 
-    const timer = setTimeout(async () => {
-      if (trimmed.length === 0) {
-        setResults([])
-        setSearched(false)
+    const timer = setTimeout(
+      async () => {
+        if (trimmed.length === 0) {
+          setResults([])
+          setSearched(false)
+          setSearchError(false)
+          setLoading(false)
+          return
+        }
+        setLoading(true)
         setSearchError(false)
-        setLoading(false)
-        return
-      }
-      setLoading(true)
-      setSearchError(false)
-      try {
-        const data = await searchTickers(trimmed)
-        setResults(data)
-        setSearched(true)
-      } catch {
-        setResults([])
-        setSearched(true)
-        setSearchError(true)
-      } finally {
-        setLoading(false)
-      }
-    }, trimmed.length === 0 ? 0 : 300)
+        try {
+          const data = await searchTickers(trimmed)
+          setResults(data)
+          setSearched(true)
+        } catch {
+          setResults([])
+          setSearched(true)
+          setSearchError(true)
+        } finally {
+          setLoading(false)
+        }
+      },
+      trimmed.length === 0 ? 0 : 300
+    )
 
     return () => clearTimeout(timer)
   }, [query])
@@ -68,8 +74,8 @@ export default function TickersPage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by symbol or company name…"
-          aria-label="Search tickers"
+          placeholder={t.tickers.search_placeholder}
+          aria-label={t.tickers.search_aria}
           autoFocus
           className={cn(
             'w-full rounded-xl border border-border bg-surface py-3 pl-10 pr-4 text-sm',
@@ -80,19 +86,15 @@ export default function TickersPage() {
       </div>
 
       {/* Results */}
-      {!query.trim() && (
-        <p className="text-sm text-text-muted">Type a symbol or company name to search.</p>
-      )}
+      {!query.trim() && <p className="text-sm text-text-muted">{t.tickers.search_prompt}</p>}
 
       {searched && !loading && searchError && (
-        <p className="text-sm text-loss">
-          Search failed. Check your connection and try again.
-        </p>
+        <p className="text-sm text-loss">{t.tickers.search_error}</p>
       )}
 
       {searched && !loading && !searchError && results.length === 0 && (
         <p className="text-sm text-text-secondary">
-          No results for <span className="font-semibold">&ldquo;{query}&rdquo;</span>.
+          {interpolate(t.tickers.search_no_results, { query })}
         </p>
       )}
 

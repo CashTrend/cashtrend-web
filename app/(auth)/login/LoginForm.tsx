@@ -88,9 +88,7 @@ export default function LoginForm() {
       {/* Header */}
       <div className="flex flex-col gap-1 text-center">
         <h1 className="text-2xl font-bold text-text-primary">Welcome back</h1>
-        <p className="text-sm text-text-secondary">
-          Sign in to your CashTrend account
-        </p>
+        <p className="text-sm text-text-secondary">Sign in to your CashTrend account</p>
       </div>
 
       {/* Form */}
@@ -135,10 +133,7 @@ export default function LoginForm() {
       {/* Footer */}
       <p className="text-center text-sm text-text-secondary">
         Don&apos;t have an account?{' '}
-        <Link
-          href="/register"
-          className="font-medium text-brand hover:underline"
-        >
+        <Link href="/register" className="font-medium text-brand hover:underline">
           Create one
         </Link>
       </p>

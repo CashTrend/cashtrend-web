@@ -21,9 +21,10 @@ import { usePathname } from 'next/navigation'
 import { LayoutDashboard, ReceiptText, Search, TrendingUp, LogOut, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/auth-context'
+import { useLocale } from '@/context/locale-context'
 
 interface NavItem {
-  label: string
+  labelKey: 'dashboard' | 'portfolio' | 'tickers'
   href: string
   icon: React.ReactNode
   /** Match any path that starts with this prefix (for nested routes). */
@@ -32,18 +33,18 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    label: 'Dashboard',
+    labelKey: 'dashboard',
     href: '/',
     icon: <LayoutDashboard size={18} aria-hidden="true" />,
   },
   {
-    label: 'Portfolio',
+    labelKey: 'portfolio',
     href: '/portfolio',
     icon: <ReceiptText size={18} aria-hidden="true" />,
     matchPrefix: '/portfolio',
   },
   {
-    label: 'Tickers',
+    labelKey: 'tickers',
     href: '/tickers',
     icon: <Search size={18} aria-hidden="true" />,
     matchPrefix: '/tickers',
@@ -59,6 +60,7 @@ function isActive(item: NavItem, pathname: string): boolean {
 export function Sidebar() {
   const pathname = usePathname()
   const { logout, user } = useAuth()
+  const { t } = useLocale()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   // Close mobile drawer on Escape key
@@ -76,11 +78,13 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-5">
         <TrendingUp size={18} className="shrink-0 text-brand" aria-hidden="true" />
-        <span className="text-sm font-bold tracking-tight text-sidebar-text-active">CashTrend</span>
+        <span className="text-sm font-bold tracking-tight text-sidebar-text-active">
+          {t.ui.app_name}
+        </span>
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Main navigation">
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label={t.nav.main_nav}>
         {NAV_ITEMS.map((item) => {
           const active = isActive(item, pathname)
           return (
@@ -97,7 +101,7 @@ export function Sidebar() {
               )}
             >
               {item.icon}
-              {item.label}
+              {t.nav[item.labelKey]}
             </Link>
           )
         })}
@@ -122,7 +126,7 @@ export function Sidebar() {
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-text transition-colors hover:bg-sidebar-hover hover:text-sidebar-text-active"
         >
           <LogOut size={18} aria-hidden="true" />
-          Sign out
+          {t.nav.sign_out}
         </button>
       </div>
     </div>
@@ -133,7 +137,7 @@ export function Sidebar() {
       {/* ── Desktop sidebar ── */}
       <aside
         className="hidden w-60 shrink-0 border-r border-sidebar-border bg-sidebar-bg lg:flex lg:flex-col"
-        aria-label="Sidebar"
+        aria-label={t.nav.sidebar}
       >
         {sidebarContent}
       </aside>
@@ -141,7 +145,7 @@ export function Sidebar() {
       {/* ── Mobile: hamburger trigger ── */}
       <button
         onClick={() => setMobileOpen(true)}
-        aria-label="Open navigation"
+        aria-label={t.nav.open_nav}
         aria-expanded={mobileOpen}
         className={cn(
           'fixed left-4 top-3.5 z-40 flex h-8 w-8 items-center justify-center rounded-lg',
@@ -164,7 +168,7 @@ export function Sidebar() {
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation"
+        aria-label={t.nav.navigation}
         aria-hidden={!mobileOpen}
         inert={!mobileOpen ? true : undefined}
         className={cn(
@@ -176,7 +180,7 @@ export function Sidebar() {
         {/* Close button */}
         <button
           onClick={() => setMobileOpen(false)}
-          aria-label="Close navigation"
+          aria-label={t.nav.close_nav}
           className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-lg text-sidebar-text hover:bg-sidebar-hover"
         >
           <X size={16} aria-hidden="true" />

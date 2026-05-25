@@ -1,22 +1,16 @@
+'use client'
+
 /**
  * FinancialsTab — generic table component for Income / Balance / Cashflow statements.
  *
- * Instead of three near-identical components, this one accepts a column
- * definition array so the parent can pass the right columns for each statement type.
- *
- * All values are nullable decimal strings → formatted with formatCompactCurrency().
- * Dates use formatDate().
- *
- * Usage:
- *   <FinancialsTab
- *     title="Income Statement"
- *     rows={incomeData}
- *     columns={INCOME_COLUMNS}
- *   />
+ * Column definitions accept an optional `glossaryEntry` which renders a
+ * FieldTooltip next to the column header label.
  */
 
 import { formatCompactCurrency, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { FieldTooltip } from '@/components/ui/FieldTooltip'
+import type { GlossaryEntry } from '@/lib/i18n/types'
 
 /** Column definition for a financial statement table. */
 export interface FinancialColumn<T> {
@@ -25,6 +19,8 @@ export interface FinancialColumn<T> {
   key: keyof T
   /** Formatter override — defaults to formatCompactCurrency. */
   format?: (value: string | null | undefined) => string
+  /** Optional glossary entry — renders a FieldTooltip in the column header. */
+  glossaryEntry?: GlossaryEntry
 }
 
 interface FinancialsTabProps<T extends { id: number; date: string }> {
@@ -45,9 +41,7 @@ export function FinancialsTab<T extends { id: number; date: string }>({
   emptyMessage = 'No data available.',
 }: FinancialsTabProps<T>) {
   if (rows.length === 0) {
-    return (
-      <p className="py-12 text-center text-sm text-text-muted">{emptyMessage}</p>
-    )
+    return <p className="py-12 text-center text-sm text-text-muted">{emptyMessage}</p>
   }
 
   return (
@@ -60,7 +54,10 @@ export function FinancialsTab<T extends { id: number; date: string }>({
               <th className={TH}>Year</th>
               {columns.map((col) => (
                 <th key={String(col.key)} className={cn(TH, 'text-right')}>
-                  {col.label}
+                  <span className="inline-flex items-center justify-end gap-1">
+                    {col.label}
+                    {col.glossaryEntry && <FieldTooltip entry={col.glossaryEntry} />}
+                  </span>
                 </th>
               ))}
             </tr>

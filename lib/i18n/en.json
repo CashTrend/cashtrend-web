@@ -1,0 +1,399 @@
+{
+  "ui": {
+    "app_name": "CashTrend",
+    "language_toggle_label": "ES",
+    "theme_switch_light": "Switch to light mode",
+    "theme_switch_dark": "Switch to dark mode",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "no_data": "No data available.",
+    "error_backend": "Make sure the backend is running."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
+    "tickers": "Tickers",
+    "sign_out": "Sign out",
+    "open_nav": "Open navigation",
+    "close_nav": "Close navigation",
+    "main_nav": "Main navigation",
+    "sidebar": "Sidebar",
+    "navigation": "Navigation"
+  },
+  "header": {
+    "page_dashboard": "Dashboard",
+    "page_portfolio": "Portfolio",
+    "page_new_transaction": "New Transaction",
+    "page_tickers": "Tickers",
+    "page_edit_transaction": "Edit Transaction",
+    "page_ticker_detail": "Ticker",
+    "fallback": "CashTrend",
+    "signed_in_as": "Signed in as {{username}}"
+  },
+  "dashboard": {
+    "loading": "Loading dashboard",
+    "portfolio_summary": "Portfolio summary",
+    "portfolio_value": "Portfolio Value",
+    "portfolio_value_desc": "Market value of open positions",
+    "total_invested": "Total Invested",
+    "total_invested_desc": "Capital deployed in open positions",
+    "unrealised_pnl": "Unrealised P&L",
+    "unrealised_pnl_desc": "Current value − total invested",
+    "open_positions": "Open Positions",
+    "holding_singular": "holding",
+    "holding_plural": "holdings",
+    "error": "Could not load portfolio data."
+  },
+  "portfolio": {
+    "page_title": "Portfolio",
+    "new_transaction": "New transaction",
+    "transaction_singular": "transaction",
+    "transaction_plural": "transactions",
+    "shown_suffix": "shown",
+    "delete_confirm_title": "Delete transaction?",
+    "delete_confirm_body": "This action cannot be undone.",
+    "delete_button": "Delete",
+    "error_load": "Could not load transactions.",
+    "error_delete": "Failed to delete transaction. Please try again.",
+    "list": {
+      "empty_heading": "No transactions found",
+      "empty_subtext": "Try changing your filters, or add a new transaction.",
+      "caption": "Transaction history",
+      "col_date": "Date",
+      "col_type": "Type",
+      "col_ticker": "Ticker",
+      "col_qty": "Qty",
+      "col_price": "Price",
+      "col_amount": "Amount",
+      "col_notes": "Notes",
+      "col_actions": "Actions",
+      "aria_edit": "Edit {{type}} transaction on {{date}}",
+      "aria_delete": "Delete {{type}} transaction on {{date}}"
+    },
+    "form": {
+      "new_title": "New Transaction",
+      "edit_title": "Edit Transaction",
+      "submit_create": "Create transaction",
+      "submit_edit": "Save changes",
+      "type_label": "Transaction type",
+      "type_aria": "Transaction type",
+      "type_buy": "Buy",
+      "type_sell": "Sell",
+      "type_income": "Income",
+      "type_expense": "Expense",
+      "ticker_label": "Ticker",
+      "quantity_label": "Quantity",
+      "price_label": "Price per unit",
+      "amount_label": "Amount",
+      "date_label": "Date",
+      "notes_label": "Notes",
+      "notes_placeholder": "Optional notes\u2026",
+      "number_placeholder": "0.00",
+      "cancel": "Cancel",
+      "error_unexpected": "An unexpected error occurred.",
+      "error_save": "Failed to save changes. Please try again.",
+      "error_create": "Failed to create transaction. Please try again.",
+      "error_not_found": "Transaction not found or could not be loaded.",
+      "error_invalid_id": "Invalid transaction ID.",
+      "validation": {
+        "required": "Required",
+        "positive": "Must be a positive number",
+        "ticker_required": "Select a ticker"
+      }
+    }
+  },
+  "tickers": {
+    "search_placeholder": "Search by symbol or company name\u2026",
+    "search_aria": "Search tickers",
+    "search_prompt": "Type a symbol or company name to search.",
+    "search_error": "Search failed. Check your connection and try again.",
+    "search_no_results": "No results for \u201c{{query}}\u201d.",
+    "autocomplete_label": "Search ticker",
+    "autocomplete_placeholder": "Search symbol or company\u2026",
+    "autocomplete_remove": "Remove {{symbol}}",
+    "autocomplete_no_results": "No results found.",
+    "error_load": "Could not load ticker data.",
+    "tabs": {
+      "ratios": "Ratios",
+      "history": "History",
+      "income": "Income",
+      "balance": "Balance",
+      "cashflow": "Cash Flow",
+      "aria": "Ticker information tabs"
+    },
+    "ratios": {
+      "no_data": "No ratio data available.",
+      "section_valuation": "Valuation",
+      "section_profitability": "Profitability",
+      "section_cashflow": "Cash Flow",
+      "section_dividends": "Dividends",
+      "beta": "Beta",
+      "pe_trailing": "P/E (Trailing)",
+      "pe_forward": "P/E (Forward)",
+      "eps_trailing": "EPS (Trailing)",
+      "eps_forward": "EPS (Forward)",
+      "peg": "PEG Ratio",
+      "ps": "P/S Ratio",
+      "pb": "P/B Ratio",
+      "ev_revenue": "EV / Revenue",
+      "ev_ebitda": "EV / EBITDA",
+      "gross_margin": "Gross Margin",
+      "operating_margin": "Operating Margin",
+      "ebitda_margin": "EBITDA Margin",
+      "net_margin": "Net Profit Margin",
+      "roa": "ROA",
+      "roe": "ROE",
+      "leverage": "Leverage Ratio",
+      "op_cashflow": "Operating Cash Flow",
+      "free_cashflow": "Free Cash Flow",
+      "dividend_yield": "Dividend Yield",
+      "dividend_date": "Dividend Date",
+      "ex_dividend_date": "Ex-Dividend Date"
+    },
+    "history": {
+      "no_data": "No price history available.",
+      "error": "Could not load price history.",
+      "granularity_aria": "Time granularity",
+      "granularity_all": "All",
+      "show_label": "Show",
+      "per_page": "per page",
+      "entries_per_page_aria": "Entries per page",
+      "caption": "Price history for {{symbol}}",
+      "col_date": "Date",
+      "col_open": "Open",
+      "col_high": "High",
+      "col_low": "Low",
+      "col_close": "Close",
+      "col_dividend": "Dividend",
+      "prev": "Previous",
+      "next": "Next",
+      "page_info": "Page {{page}} of {{total}} \u00b7 {{count}} {{unit}}",
+      "unit_days": "days",
+      "unit_weeks": "weeks",
+      "unit_months": "months",
+      "unit_years": "years",
+      "unit_entries": "entries",
+      "chart_aria": "Price history chart"
+    },
+    "income": {
+      "title": "Income Statement",
+      "no_data": "No income statement data available.",
+      "col_revenue": "Revenue",
+      "col_gross_profit": "Gross Profit",
+      "col_operating_profit": "Operating Profit",
+      "col_ebit": "EBIT",
+      "col_ebitda": "EBITDA",
+      "col_net_profit": "Net Profit"
+    },
+    "balance": {
+      "title": "Balance Sheet",
+      "no_data": "No balance sheet data available.",
+      "col_current_assets": "Current Assets",
+      "col_noncurrent_assets": "Non-Current Assets",
+      "col_current_liabilities": "Current Liabilities",
+      "col_noncurrent_liabilities": "Non-Current Liabilities",
+      "col_equity": "Net Equity"
+    },
+    "cashflow": {
+      "title": "Cash Flow Statement",
+      "no_data": "No cash flow data available.",
+      "col_operating": "Operating",
+      "col_investing": "Investing",
+      "col_financing": "Financing"
+    },
+    "financials": {
+      "col_year": "Year",
+      "no_data": "No data available."
+    }
+  },
+  "glossary": {
+    "ratios": {
+      "beta": {
+        "label": "Beta",
+        "summary": "Measures the stock's volatility relative to the market.",
+        "detail": "A Beta of 1 means the stock moves in line with the market. Above 1 indicates more volatility; below 1 indicates less. Negative Beta means it tends to move opposite to the market."
+      },
+      "pe_trailing": {
+        "label": "P/E (Trailing)",
+        "summary": "Price divided by earnings per share over the past 12 months.",
+        "detail": "The trailing P/E uses actual reported earnings. A higher ratio suggests investors expect future growth; a lower one may indicate undervaluation or slower growth expectations."
+      },
+      "pe_forward": {
+        "label": "P/E (Forward)",
+        "summary": "Price divided by estimated earnings per share for the next 12 months.",
+        "detail": "Uses analyst forecasts instead of reported earnings. Forward P/E is useful for comparing a company's current valuation against expected performance."
+      },
+      "eps_trailing": {
+        "label": "EPS (Trailing)",
+        "summary": "Net profit per share over the last 12 months.",
+        "detail": "Earnings Per Share is net income divided by diluted shares outstanding. Trailing EPS is based on reported figures; rising EPS generally signals improving profitability."
+      },
+      "eps_forward": {
+        "label": "EPS (Forward)",
+        "summary": "Estimated net profit per share for the next 12 months.",
+        "detail": "Forward EPS relies on analyst consensus estimates. It shows where the market expects earnings to go, which is useful for growth-oriented valuation comparisons."
+      },
+      "peg": {
+        "label": "PEG Ratio",
+        "summary": "P/E ratio divided by the earnings growth rate.",
+        "detail": "A PEG below 1 is often considered undervalued relative to growth; above 1 may be overvalued. It adjusts the P/E for expected growth, giving a more complete valuation picture."
+      },
+      "ps": {
+        "label": "P/S Ratio",
+        "summary": "Price divided by revenue per share.",
+        "detail": "Price-to-Sales is useful for valuing companies with no earnings yet. A low P/S relative to peers may indicate undervaluation, but profitability context is still important."
+      },
+      "pb": {
+        "label": "P/B Ratio",
+        "summary": "Price divided by book value per share.",
+        "detail": "Price-to-Book compares market value to net assets. Values below 1 may suggest the stock trades below its asset value. Common in financial sector analysis."
+      },
+      "ev_revenue": {
+        "label": "EV / Revenue",
+        "summary": "Enterprise Value divided by total revenue.",
+        "detail": "EV/Revenue shows how much investors pay per dollar of revenue, accounting for debt and cash. Useful for comparing companies with different capital structures."
+      },
+      "ev_ebitda": {
+        "label": "EV / EBITDA",
+        "summary": "Enterprise Value divided by EBITDA.",
+        "detail": "One of the most popular valuation multiples. It strips out accounting differences (depreciation, taxes, interest) to compare operational profitability across companies and sectors."
+      },
+      "gross_margin": {
+        "label": "Gross Margin",
+        "summary": "Percentage of revenue remaining after cost of goods sold.",
+        "detail": "Gross Margin = (Revenue − COGS) / Revenue. Higher margins indicate stronger pricing power or lower production costs. Varies significantly by industry."
+      },
+      "operating_margin": {
+        "label": "Operating Margin",
+        "summary": "Percentage of revenue remaining after operating expenses.",
+        "detail": "Operating Margin = Operating Income / Revenue. It measures core business profitability before interest and taxes. A rising trend usually signals improving efficiency."
+      },
+      "ebitda_margin": {
+        "label": "EBITDA Margin",
+        "summary": "EBITDA as a percentage of revenue.",
+        "detail": "EBITDA Margin = EBITDA / Revenue. Used to gauge cash generation capacity independent of capital structure and accounting policies. Widely used in leveraged buyout analysis."
+      },
+      "net_margin": {
+        "label": "Net Profit Margin",
+        "summary": "Percentage of revenue that becomes net profit.",
+        "detail": "Net Margin = Net Income / Revenue. The bottom-line profitability metric after all expenses, taxes, and interest. Highly variable across industries."
+      },
+      "roa": {
+        "label": "ROA",
+        "summary": "Return on Assets — net income divided by total assets.",
+        "detail": "ROA measures how efficiently management uses its asset base to generate profit. Higher is better; asset-heavy industries (manufacturing, banking) tend to have lower ROA."
+      },
+      "roe": {
+        "label": "ROE",
+        "summary": "Return on Equity — net income divided by shareholders' equity.",
+        "detail": "ROE shows how much profit is generated per dollar of equity. A consistently high ROE can indicate a competitive advantage, but very high values may also reflect high debt levels."
+      },
+      "leverage": {
+        "label": "Leverage Ratio",
+        "summary": "Total assets divided by shareholders' equity.",
+        "detail": "Also called the equity multiplier. A higher leverage ratio means more assets are financed by debt rather than equity, amplifying both returns and risk."
+      },
+      "op_cashflow": {
+        "label": "Operating Cash Flow",
+        "summary": "Cash generated by core business operations.",
+        "detail": "Operating Cash Flow (OCF) is the actual cash a company generates from its main activities, before investing or financing. Positive OCF is a sign of a financially healthy business."
+      },
+      "free_cashflow": {
+        "label": "Free Cash Flow",
+        "summary": "Operating cash flow minus capital expenditures.",
+        "detail": "FCF represents cash available after maintaining and expanding the asset base. Companies with consistently positive FCF can reinvest in growth, pay dividends, or reduce debt."
+      },
+      "dividend_yield": {
+        "label": "Dividend Yield",
+        "summary": "Annual dividend per share divided by stock price.",
+        "detail": "Expressed as a percentage, dividend yield shows how much income an investor earns per dollar invested. High yield can signal value — or, if unusually high, financial stress."
+      },
+      "dividend_date": {
+        "label": "Dividend Date",
+        "summary": "Date the dividend payment is distributed to shareholders.",
+        "detail": "Also called the payment date. Investors who held the stock before the ex-dividend date receive this payment on the dividend date."
+      },
+      "ex_dividend_date": {
+        "label": "Ex-Dividend Date",
+        "summary": "Cutoff date to be eligible for the upcoming dividend.",
+        "detail": "You must own the stock before the ex-dividend date to receive the declared dividend. On this date, the stock price typically drops by approximately the dividend amount."
+      }
+    },
+    "income": {
+      "revenue": {
+        "label": "Revenue",
+        "summary": "Total income from the company's primary business activities.",
+        "detail": "Also called the top line. Revenue is recognized before deducting any costs. Sustained revenue growth is a key indicator of business expansion."
+      },
+      "gross_profit": {
+        "label": "Gross Profit",
+        "summary": "Revenue minus cost of goods sold.",
+        "detail": "Gross Profit shows how efficiently a company produces its goods or services. It is the starting point for calculating operating and net profitability."
+      },
+      "operating_profit": {
+        "label": "Operating Profit",
+        "summary": "Profit from operations before interest and taxes.",
+        "detail": "Also called EBIT in some contexts. Operating profit deducts operating expenses (salaries, rent, depreciation) from gross profit, revealing core business performance."
+      },
+      "ebit": {
+        "label": "EBIT",
+        "summary": "Earnings Before Interest and Taxes.",
+        "detail": "EBIT measures operating profitability without the effects of financing decisions (interest) or tax jurisdictions. Useful for comparing companies in the same industry across different countries."
+      },
+      "ebitda": {
+        "label": "EBITDA",
+        "summary": "Earnings Before Interest, Taxes, Depreciation, and Amortization.",
+        "detail": "EBITDA is a widely-used proxy for cash earnings. By adding back non-cash charges (D&A), it provides a cleaner view of operational cash generation."
+      },
+      "net_profit": {
+        "label": "Net Profit",
+        "summary": "The company's bottom-line profit after all expenses and taxes.",
+        "detail": "Net profit (net income) is what remains after subtracting COGS, operating expenses, interest, and taxes from revenue. It is the basis for EPS calculations and dividend payments."
+      }
+    },
+    "balance": {
+      "current_assets": {
+        "label": "Current Assets",
+        "summary": "Assets expected to be converted to cash within one year.",
+        "detail": "Includes cash, accounts receivable, inventory, and short-term investments. Higher current assets relative to current liabilities indicates stronger short-term liquidity."
+      },
+      "noncurrent_assets": {
+        "label": "Non-Current Assets",
+        "summary": "Long-term assets not expected to be liquidated within a year.",
+        "detail": "Includes property, plant & equipment (PP&E), intangibles, and long-term investments. Non-current assets represent the company's long-term infrastructure and strategic holdings."
+      },
+      "current_liabilities": {
+        "label": "Current Liabilities",
+        "summary": "Obligations due within one year.",
+        "detail": "Includes accounts payable, short-term debt, and accrued expenses. Monitoring the ratio of current assets to current liabilities (current ratio) reveals short-term financial health."
+      },
+      "noncurrent_liabilities": {
+        "label": "Non-Current Liabilities",
+        "summary": "Long-term financial obligations due beyond one year.",
+        "detail": "Primarily long-term debt, deferred tax liabilities, and pension obligations. High non-current liabilities relative to equity may indicate elevated financial leverage."
+      },
+      "equity": {
+        "label": "Net Equity",
+        "summary": "Shareholders' equity — total assets minus total liabilities.",
+        "detail": "Also called book value. Net equity represents the residual interest in the company's assets after all debts are paid. It is the accounting measure of a company's net worth."
+      }
+    },
+    "cashflow": {
+      "operating": {
+        "label": "Operating Cash Flow",
+        "summary": "Cash generated or used by core business operations.",
+        "detail": "Derived from the income statement adjusted for non-cash items and changes in working capital. Positive and growing operating cash flow is a strong signal of business health."
+      },
+      "investing": {
+        "label": "Investing Cash Flow",
+        "summary": "Cash used for or generated from investments in assets.",
+        "detail": "Includes purchases and sales of property, equipment, and financial investments. Consistently negative investing cash flow often means the company is reinvesting heavily for future growth."
+      },
+      "financing": {
+        "label": "Financing Cash Flow",
+        "summary": "Cash flows related to debt, equity, and dividend payments.",
+        "detail": "Covers borrowing, loan repayments, share issuances or buybacks, and dividends paid. Positive financing cash flow usually means the company is raising capital; negative means returning it."
+      }
+    }
+  }
+}

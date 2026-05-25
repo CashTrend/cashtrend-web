@@ -118,9 +118,7 @@ export default function RegisterPage() {
       {/* Header */}
       <div className="flex flex-col gap-1 text-center">
         <h1 className="text-2xl font-bold text-text-primary">Create your account</h1>
-        <p className="text-sm text-text-secondary">
-          Start tracking your portfolio today
-        </p>
+        <p className="text-sm text-text-secondary">Start tracking your portfolio today</p>
       </div>
 
       {/* Form */}
@@ -195,10 +193,7 @@ export default function RegisterPage() {
       {/* Footer */}
       <p className="text-center text-sm text-text-secondary">
         Already have an account?{' '}
-        <Link
-          href="/login"
-          className="font-medium text-brand hover:underline"
-        >
+        <Link href="/login" className="font-medium text-brand hover:underline">
           Sign in
         </Link>
       </p>

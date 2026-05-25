@@ -32,7 +32,14 @@ interface SummaryCardProps {
   className?: string
 }
 
-export function SummaryCard({ label, value, icon, badge, description, className }: SummaryCardProps) {
+export function SummaryCard({
+  label,
+  value,
+  icon,
+  badge,
+  description,
+  className,
+}: SummaryCardProps) {
   return (
     <div
       className={cn(

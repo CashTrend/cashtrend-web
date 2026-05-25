@@ -77,10 +77,7 @@ export function HoldingsTable({ holdings, className }: HoldingsTableProps) {
               >
                 {/* Symbol + name */}
                 <td className={TD}>
-                  <Link
-                    href={`/tickers/${h.symbol}`}
-                    className="group flex flex-col"
-                  >
+                  <Link href={`/tickers/${h.symbol}`} className="group flex flex-col">
                     <span className="font-semibold text-brand group-hover:underline">
                       {h.symbol}
                     </span>

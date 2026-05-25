@@ -12,6 +12,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { getTransaction, updateTransaction } from '@/services/portfolio.service'
+import { useLocale } from '@/context/locale-context'
 import { TransactionForm } from '@/components/portfolio/TransactionForm'
 import { FormError } from '@/components/ui'
 import type { CreateTransactionRequest, Transaction } from '@/lib/types'
@@ -28,7 +29,7 @@ async function loadTransaction(
     const data = await getTransaction(id)
     setTx(data)
   } catch {
-    setError('Transaction not found or could not be loaded.')
+    setError('not_found')
   } finally {
     setLoading(false)
   }
@@ -37,14 +38,12 @@ async function loadTransaction(
 export default function EditTransactionPage() {
   const router = useRouter()
   const params = useParams()
+  const { t } = useLocale()
   const id = Number(params.id)
 
   const [tx, setTx] = useState<Transaction | null>(null)
-  // Initialise loading/error from the id so we never call setState inside the effect body
   const [loading, setLoading] = useState<boolean>(() => Boolean(id && !isNaN(id)))
-  const [loadError, setLoadError] = useState<string>(() =>
-    !id || isNaN(id) ? 'Invalid transaction ID.' : ''
-  )
+  const [loadError, setLoadError] = useState<string>(() => (!id || isNaN(id) ? 'invalid_id' : ''))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -64,7 +63,7 @@ export default function EditTransactionPage() {
       await updateTransaction(id, payload)
       router.push('/portfolio')
     } catch {
-      setSubmitError('Failed to save changes. Please try again.')
+      setSubmitError(t.portfolio.form.error_save)
     } finally {
       setIsSubmitting(false)
     }
@@ -78,12 +77,23 @@ export default function EditTransactionPage() {
     )
   }
 
-  if (loadError || !tx) {
+  const displayError =
+    loadError === 'invalid_id'
+      ? t.portfolio.form.error_invalid_id
+      : loadError === 'not_found'
+        ? t.portfolio.form.error_not_found
+        : loadError
+          ? t.portfolio.form.error_not_found
+          : null
+
+  if (displayError || !tx) {
     return (
       <div className="mx-auto max-w-lg text-center py-24">
-        <p className="text-sm text-text-secondary">{loadError || 'Transaction not found.'}</p>
+        <p className="text-sm text-text-secondary">
+          {displayError ?? t.portfolio.form.error_not_found}
+        </p>
         <Link href="/portfolio" className="mt-4 inline-block text-sm text-brand hover:underline">
-          Back to Portfolio
+          {t.nav.portfolio}
         </Link>
       </div>
     )
@@ -92,13 +102,15 @@ export default function EditTransactionPage() {
   return (
     <div className="mx-auto max-w-lg">
       <div className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="mb-6 text-base font-semibold text-text-primary">Edit Transaction</h2>
+        <h2 className="mb-6 text-base font-semibold text-text-primary">
+          {t.portfolio.form.edit_title}
+        </h2>
         <FormError message={submitError} />
         <TransactionForm
           initialValues={tx}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          submitLabel="Save changes"
+          submitLabel={t.portfolio.form.submit_edit}
           onCancel={() => router.push('/portfolio')}
         />
       </div>

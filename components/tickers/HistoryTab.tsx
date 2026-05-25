@@ -5,20 +5,7 @@
  *
  * Controls:
  *   - Granularity pill selector: 1D | 1W | 1M | 1Y | ALL
- *     1D = every trading day, 1W = Mondays, 1M = first day of each month,
- *     1Y = last available day of each year, ALL = all records unpaginated.
- *   - Page size select: 10 | 20 | 50 | 100 (hidden when granularity = ALL)
- *
- * Layout:
- *   Controls row (granularity pills + page size select)
- *   PriceChart (area chart of close prices for current page/all data)
- *   ─────────────────────────────────────────────────────────────────
- *   Table: Date | Open | High | Low | Close | Dividend
- *   Pagination: Previous / Page N of M · X <unit> / Next
- *     (hidden when granularity = ALL)
- *
- * Usage:
- *   <HistoryTab symbol="AAPL" />
+ *   - Page size select (hidden for ALL)
  */
 
 import { useEffect, useState, useRef } from 'react'
@@ -27,26 +14,11 @@ import { getTickerHistory } from '@/services/tickers.service'
 import { PriceChart } from './PriceChart'
 import { formatCurrency, formatDate, formatNumber } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { useLocale } from '@/context/locale-context'
+import { interpolate } from '@/lib/i18n/types'
 import type { PaginatedResponse, TickerHistoryEntry, HistoryGranularity } from '@/lib/types'
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const
-
-const GRANULARITY_OPTIONS: { value: HistoryGranularity; label: string }[] = [
-  { value: '1D', label: '1D' },
-  { value: '1W', label: '1W' },
-  { value: '1M', label: '1M' },
-  { value: '1Y', label: '1Y' },
-  { value: 'ALL', label: 'All' },
-]
-
-/** Human-readable unit label for the pagination footer. */
-const GRANULARITY_UNIT: Record<HistoryGranularity, string> = {
-  '1D': 'days',
-  '1W': 'weeks',
-  '1M': 'months',
-  '1Y': 'years',
-  ALL: 'entries',
-}
 
 interface HistoryTabProps {
   symbol: string
@@ -61,6 +33,7 @@ async function loadPage(
   page: number,
   pageSize: number,
   granularity: HistoryGranularity,
+  errorMsg: string,
   setData: (d: HistoryData) => void,
   setError: (e: string) => void,
   setLoading: (l: boolean) => void
@@ -75,7 +48,7 @@ async function loadPage(
       setData({ kind: 'paginated', data: result })
     }
   } catch {
-    setError('Could not load price history.')
+    setError(errorMsg)
   } finally {
     setLoading(false)
   }
@@ -85,6 +58,7 @@ const TH = 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider t
 const TD = 'px-4 py-3 text-sm tabular-nums text-text-primary'
 
 export function HistoryTab({ symbol }: HistoryTabProps) {
+  const { t } = useLocale()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState<number>(10)
   const [granularity, setGranularity] = useState<HistoryGranularity>('1D')
@@ -96,17 +70,34 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
   const setErrorRef = useRef(setError)
   const setLoadingRef = useRef(setLoading)
 
+  const GRANULARITY_UNIT: Record<HistoryGranularity, string> = {
+    '1D': t.tickers.history.unit_days,
+    '1W': t.tickers.history.unit_weeks,
+    '1M': t.tickers.history.unit_months,
+    '1Y': t.tickers.history.unit_years,
+    ALL: t.tickers.history.unit_entries,
+  }
+
+  const GRANULARITY_OPTIONS: { value: HistoryGranularity; label: string }[] = [
+    { value: '1D', label: '1D' },
+    { value: '1W', label: '1W' },
+    { value: '1M', label: '1M' },
+    { value: '1Y', label: '1Y' },
+    { value: 'ALL', label: t.tickers.history.granularity_all },
+  ]
+
   useEffect(() => {
     loadPage(
       symbol,
       page,
       pageSize,
       granularity,
+      t.tickers.history.error,
       setHistoryDataRef.current,
       setErrorRef.current,
       setLoadingRef.current
     )
-  }, [symbol, page, pageSize, granularity])
+  }, [symbol, page, pageSize, granularity, t.tickers.history.error])
 
   function handleGranularityChange(g: HistoryGranularity) {
     setGranularity(g)
@@ -157,7 +148,7 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
         <div
           className="flex items-center gap-1 rounded-lg border border-border bg-surface p-1"
           role="group"
-          aria-label="Time granularity"
+          aria-label={t.tickers.history.granularity_aria}
         >
           {GRANULARITY_OPTIONS.map(({ value, label }) => (
             <button
@@ -179,12 +170,12 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
         {/* Page size select — hidden for ALL */}
         {!isAll && (
           <label className="flex items-center gap-2 text-xs text-text-secondary">
-            Show
+            {t.tickers.history.show_label}
             <select
               value={pageSize}
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}
               className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-brand"
-              aria-label="Entries per page"
+              aria-label={t.tickers.history.entries_per_page_aria}
             >
               {PAGE_SIZE_OPTIONS.map((s) => (
                 <option key={s} value={s}>
@@ -192,13 +183,13 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
                 </option>
               ))}
             </select>
-            per page
+            {t.tickers.history.per_page}
           </label>
         )}
       </div>
 
       {entries.length === 0 ? (
-        <p className="py-12 text-center text-sm text-text-muted">No price history available.</p>
+        <p className="py-12 text-center text-sm text-text-muted">{t.tickers.history.no_data}</p>
       ) : (
         <>
           {/* Chart */}
@@ -208,15 +199,17 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
           <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[540px] border-collapse">
-                <caption className="sr-only">Price history for {symbol}</caption>
+                <caption className="sr-only">
+                  {interpolate(t.tickers.history.caption, { symbol })}
+                </caption>
                 <thead>
                   <tr className="border-b border-border bg-surface-raised">
-                    <th className={TH}>Date</th>
-                    <th className={cn(TH, 'text-right')}>Open</th>
-                    <th className={cn(TH, 'text-right')}>High</th>
-                    <th className={cn(TH, 'text-right')}>Low</th>
-                    <th className={cn(TH, 'text-right')}>Close</th>
-                    <th className={cn(TH, 'text-right')}>Dividend</th>
+                    <th className={TH}>{t.tickers.history.col_date}</th>
+                    <th className={cn(TH, 'text-right')}>{t.tickers.history.col_open}</th>
+                    <th className={cn(TH, 'text-right')}>{t.tickers.history.col_high}</th>
+                    <th className={cn(TH, 'text-right')}>{t.tickers.history.col_low}</th>
+                    <th className={cn(TH, 'text-right')}>{t.tickers.history.col_close}</th>
+                    <th className={cn(TH, 'text-right')}>{t.tickers.history.col_dividend}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -251,11 +244,16 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
                 className="flex items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft size={14} aria-hidden="true" />
-                Previous
+                {t.tickers.history.prev}
               </button>
 
               <span className="text-xs text-text-muted">
-                Page {page} of {totalPages} · {totalCount} {GRANULARITY_UNIT[granularity]}
+                {interpolate(t.tickers.history.page_info, {
+                  page: String(page),
+                  total: String(totalPages),
+                  count: String(totalCount),
+                  unit: GRANULARITY_UNIT[granularity],
+                })}
               </span>
 
               <button
@@ -263,7 +261,7 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
                 disabled={page === totalPages}
                 className="flex items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Next
+                {t.tickers.history.next}
                 <ChevronRight size={14} aria-hidden="true" />
               </button>
             </div>
@@ -273,4 +271,3 @@ export function HistoryTab({ symbol }: HistoryTabProps) {
     </div>
   )
 }
-

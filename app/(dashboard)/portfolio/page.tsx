@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { Plus, RefreshCw, AlertCircle } from 'lucide-react'
 import { getTransactions, deleteTransaction } from '@/services/portfolio.service'
 import { useAuth } from '@/context/auth-context'
+import { useLocale } from '@/context/locale-context'
 import { TransactionFilters, type FilterType } from '@/components/portfolio/TransactionFilters'
 import { TransactionList } from '@/components/portfolio/TransactionList'
 import type { Transaction } from '@/lib/types'
@@ -32,7 +33,7 @@ async function loadTransactions(
     const data = await getTransactions()
     setTransactions(data)
   } catch {
-    setError('Could not load transactions. Make sure the backend is running.')
+    setError('error')
   } finally {
     setLoading(false)
   }
@@ -40,6 +41,7 @@ async function loadTransactions(
 
 export default function PortfolioPage() {
   const { isLoading: authLoading } = useAuth()
+  const { t } = useLocale()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -78,9 +80,9 @@ export default function PortfolioPage() {
     setDeleteError(null)
     try {
       await deleteTransaction(id)
-      setTransactions((prev) => prev.filter((t) => t.id !== id))
+      setTransactions((prev) => prev.filter((tx) => tx.id !== id))
     } catch {
-      setDeleteError('Failed to delete transaction. Please try again.')
+      setDeleteError(t.portfolio.error_delete)
     } finally {
       setDeletingId(null)
     }
@@ -103,13 +105,15 @@ export default function PortfolioPage() {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
         <AlertCircle size={36} className="text-loss" aria-hidden="true" />
-        <p className="text-sm font-medium text-text-primary">{error}</p>
+        <p className="text-sm font-medium text-text-primary">
+          {t.portfolio.error_load} {t.ui.error_backend}
+        </p>
         <button
           onClick={handleRetry}
           className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover transition-colors"
         >
           <RefreshCw size={14} aria-hidden="true" />
-          Retry
+          {t.ui.retry}
         </button>
       </div>
     )
@@ -126,24 +130,27 @@ export default function PortfolioPage() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
         >
           <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-6 shadow-xl">
-            <h2 id="delete-confirm-title" className="mb-2 text-base font-semibold text-text-primary">
-              Delete transaction?
+            <h2
+              id="delete-confirm-title"
+              className="mb-2 text-base font-semibold text-text-primary"
+            >
+              {t.portfolio.delete_confirm_title}
             </h2>
-            <p className="mb-5 text-sm text-text-secondary">This action cannot be undone.</p>
+            <p className="mb-5 text-sm text-text-secondary">{t.portfolio.delete_confirm_body}</p>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setConfirmDeleteId(null)}
                 className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface-raised"
               >
-                Cancel
+                {t.ui.cancel}
               </button>
               <button
                 type="button"
                 onClick={confirmDelete}
                 className="rounded-lg bg-loss px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
               >
-                Delete
+                {t.portfolio.delete_button}
               </button>
             </div>
           </div>
@@ -152,7 +159,10 @@ export default function PortfolioPage() {
 
       {/* Delete error banner */}
       {deleteError && (
-        <div role="alert" className="flex items-center gap-2 rounded-lg border border-loss-border bg-loss-bg px-4 py-3 text-sm text-loss">
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-lg border border-loss-border bg-loss-bg px-4 py-3 text-sm text-loss"
+        >
           <AlertCircle size={14} aria-hidden="true" />
           {deleteError}
         </div>
@@ -161,15 +171,19 @@ export default function PortfolioPage() {
       {/* Header row */}
       <div className="flex items-center justify-between gap-4">
         <p className="text-xs text-text-muted">
-          {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
-          {filtered.length !== transactions.length && ` · ${filtered.length} shown`}
+          {transactions.length}{' '}
+          {transactions.length !== 1
+            ? t.portfolio.transaction_plural
+            : t.portfolio.transaction_singular}
+          {filtered.length !== transactions.length &&
+            ` · ${filtered.length} ${t.portfolio.shown_suffix}`}
         </p>
         <Link
           href="/portfolio/new"
           className="flex items-center gap-1.5 rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
         >
           <Plus size={15} aria-hidden="true" />
-          New transaction
+          {t.portfolio.new_transaction}
         </Link>
       </div>
 
@@ -182,11 +196,7 @@ export default function PortfolioPage() {
       />
 
       {/* List */}
-      <TransactionList
-        transactions={filtered}
-        onDelete={handleDelete}
-        isDeleting={deletingId}
-      />
+      <TransactionList transactions={filtered} onDelete={handleDelete} isDeleting={deletingId} />
     </div>
   )
 }

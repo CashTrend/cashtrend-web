@@ -1,20 +1,20 @@
+'use client'
+
 /**
  * RatiosTab — grid of financial ratios for a ticker.
  *
  * Groups ratios into logical sections:
  *   Valuation  | Profitability | Cash Flow | Dividends
  *
+ * Each ratio label includes a FieldTooltip with a glossary entry.
  * All values are nullable strings from the API — rendered as '—' when null.
- * Percentage values (margins, yields) are formatted with formatPercent().
- * Ratio values (PE, PB, etc.) are formatted as plain numbers.
- * Large cash-flow values use formatCompactCurrency().
- *
- * Usage:
- *   <RatiosTab ratios={detail.tickerratios_set} />
  */
 
 import { formatNumber, formatPercent, formatCompactCurrency, formatDate } from '@/lib/utils'
+import { FieldTooltip } from '@/components/ui/FieldTooltip'
+import { useLocale } from '@/context/locale-context'
 import type { TickerRatios } from '@/lib/types'
+import type { GlossaryEntry } from '@/lib/i18n/types'
 
 interface RatiosTabProps {
   ratios: TickerRatios | null | undefined
@@ -23,6 +23,7 @@ interface RatiosTabProps {
 interface RatioItem {
   label: string
   value: string
+  glossaryEntry?: GlossaryEntry
 }
 
 interface RatioSection {
@@ -30,58 +31,134 @@ interface RatioSection {
   items: RatioItem[]
 }
 
-function buildSections(r: TickerRatios): RatioSection[] {
-  return [
+export function RatiosTab({ ratios }: RatiosTabProps) {
+  const { t } = useLocale()
+  const g = t.glossary.ratios
+
+  if (!ratios) {
+    return <p className="py-12 text-center text-sm text-text-muted">{t.tickers.ratios.no_data}</p>
+  }
+
+  const sections: RatioSection[] = [
     {
-      title: 'Valuation',
+      title: t.tickers.ratios.section_valuation,
       items: [
-        { label: 'Beta', value: formatNumber(r.beta) },
-        { label: 'P/E (Trailing)', value: formatNumber(r.pe_ratio_past) },
-        { label: 'P/E (Forward)', value: formatNumber(r.pe_ratio_forward) },
-        { label: 'EPS (Trailing)', value: formatNumber(r.eps_past) },
-        { label: 'EPS (Forward)', value: formatNumber(r.eps_forward) },
-        { label: 'PEG Ratio', value: formatNumber(r.peg_ratio) },
-        { label: 'P/S Ratio', value: formatNumber(r.ps_ratio) },
-        { label: 'P/B Ratio', value: formatNumber(r.pb_ratio) },
-        { label: 'EV / Revenue', value: formatNumber(r.ev_income_ratio) },
-        { label: 'EV / EBITDA', value: formatNumber(r.ev_ebitda_ratio) },
+        { label: t.tickers.ratios.beta, value: formatNumber(ratios.beta), glossaryEntry: g.beta },
+        {
+          label: t.tickers.ratios.pe_trailing,
+          value: formatNumber(ratios.pe_ratio_past),
+          glossaryEntry: g.pe_trailing,
+        },
+        {
+          label: t.tickers.ratios.pe_forward,
+          value: formatNumber(ratios.pe_ratio_forward),
+          glossaryEntry: g.pe_forward,
+        },
+        {
+          label: t.tickers.ratios.eps_trailing,
+          value: formatNumber(ratios.eps_past),
+          glossaryEntry: g.eps_trailing,
+        },
+        {
+          label: t.tickers.ratios.eps_forward,
+          value: formatNumber(ratios.eps_forward),
+          glossaryEntry: g.eps_forward,
+        },
+        {
+          label: t.tickers.ratios.peg,
+          value: formatNumber(ratios.peg_ratio),
+          glossaryEntry: g.peg,
+        },
+        { label: t.tickers.ratios.ps, value: formatNumber(ratios.ps_ratio), glossaryEntry: g.ps },
+        { label: t.tickers.ratios.pb, value: formatNumber(ratios.pb_ratio), glossaryEntry: g.pb },
+        {
+          label: t.tickers.ratios.ev_revenue,
+          value: formatNumber(ratios.ev_income_ratio),
+          glossaryEntry: g.ev_revenue,
+        },
+        {
+          label: t.tickers.ratios.ev_ebitda,
+          value: formatNumber(ratios.ev_ebitda_ratio),
+          glossaryEntry: g.ev_ebitda,
+        },
       ],
     },
     {
-      title: 'Profitability',
+      title: t.tickers.ratios.section_profitability,
       items: [
-        { label: 'Gross Margin', value: formatPercent(r.gross_margin) },
-        { label: 'Operating Margin', value: formatPercent(r.operating_margin) },
-        { label: 'EBITDA Margin', value: formatPercent(r.ebitda_margin) },
-        { label: 'Net Profit Margin', value: formatPercent(r.net_profit_margin) },
-        { label: 'ROA', value: formatPercent(r.roa_ratio) },
-        { label: 'ROE', value: formatPercent(r.roe_ratio) },
-        { label: 'Leverage Ratio', value: formatNumber(r.leverage_ratio) },
+        {
+          label: t.tickers.ratios.gross_margin,
+          value: formatPercent(ratios.gross_margin),
+          glossaryEntry: g.gross_margin,
+        },
+        {
+          label: t.tickers.ratios.operating_margin,
+          value: formatPercent(ratios.operating_margin),
+          glossaryEntry: g.operating_margin,
+        },
+        {
+          label: t.tickers.ratios.ebitda_margin,
+          value: formatPercent(ratios.ebitda_margin),
+          glossaryEntry: g.ebitda_margin,
+        },
+        {
+          label: t.tickers.ratios.net_margin,
+          value: formatPercent(ratios.net_profit_margin),
+          glossaryEntry: g.net_margin,
+        },
+        {
+          label: t.tickers.ratios.roa,
+          value: formatPercent(ratios.roa_ratio),
+          glossaryEntry: g.roa,
+        },
+        {
+          label: t.tickers.ratios.roe,
+          value: formatPercent(ratios.roe_ratio),
+          glossaryEntry: g.roe,
+        },
+        {
+          label: t.tickers.ratios.leverage,
+          value: formatNumber(ratios.leverage_ratio),
+          glossaryEntry: g.leverage,
+        },
       ],
     },
     {
-      title: 'Cash Flow',
+      title: t.tickers.ratios.section_cashflow,
       items: [
-        { label: 'Operating Cash Flow', value: formatCompactCurrency(r.operating_cash_flow) },
-        { label: 'Free Cash Flow', value: formatCompactCurrency(r.free_cash_flow) },
+        {
+          label: t.tickers.ratios.op_cashflow,
+          value: formatCompactCurrency(ratios.operating_cash_flow),
+          glossaryEntry: g.op_cashflow,
+        },
+        {
+          label: t.tickers.ratios.free_cashflow,
+          value: formatCompactCurrency(ratios.free_cash_flow),
+          glossaryEntry: g.free_cashflow,
+        },
       ],
     },
     {
-      title: 'Dividends',
+      title: t.tickers.ratios.section_dividends,
       items: [
-        { label: 'Dividend Yield', value: formatPercent(r.dividend_yield) },
-        { label: 'Dividend Date', value: formatDate(r.dividend_date) },
-        { label: 'Ex-Dividend Date', value: formatDate(r.ex_dividend_date) },
+        {
+          label: t.tickers.ratios.dividend_yield,
+          value: formatPercent(ratios.dividend_yield),
+          glossaryEntry: g.dividend_yield,
+        },
+        {
+          label: t.tickers.ratios.dividend_date,
+          value: formatDate(ratios.dividend_date),
+          glossaryEntry: g.dividend_date,
+        },
+        {
+          label: t.tickers.ratios.ex_dividend_date,
+          value: formatDate(ratios.ex_dividend_date),
+          glossaryEntry: g.ex_dividend_date,
+        },
       ],
     },
   ]
-}
-
-export function RatiosTab({ ratios }: RatiosTabProps) {
-  if (!ratios) {
-    return <p className="py-12 text-center text-sm text-text-muted">No ratio data available.</p>
-  }
-  const sections = buildSections(ratios)
 
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -95,8 +172,11 @@ export function RatiosTab({ ratios }: RatiosTabProps) {
           </h3>
           <dl className="flex flex-col gap-2">
             {section.items.map((item) => (
-              <div key={item.label} className="flex items-center justify-between gap-4">
-                <dt className="text-sm text-text-secondary">{item.label}</dt>
+              <div key={item.label} className="flex items-start justify-between gap-4">
+                <dt className="flex items-center gap-1 text-sm text-text-secondary">
+                  {item.label}
+                  {item.glossaryEntry && <FieldTooltip entry={item.glossaryEntry} />}
+                </dt>
                 <dd className="text-sm font-medium tabular-nums text-text-primary">{item.value}</dd>
               </div>
             ))}

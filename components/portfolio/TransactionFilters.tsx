@@ -49,11 +49,7 @@ export function TransactionFilters({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {/* Type segmented control */}
-      <div
-        role="group"
-        aria-label="Filter by transaction type"
-        className="flex flex-wrap gap-1"
-      >
+      <div role="group" aria-label="Filter by transaction type" className="flex flex-wrap gap-1">
         {TYPE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
