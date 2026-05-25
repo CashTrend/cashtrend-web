@@ -1,26 +1,159 @@
 @import 'tailwindcss';
 
+/* ============================================================
+   Design tokens — CSS custom properties
+   All colors use the .dark class toggle managed by next-themes.
+   Components should reference these variables (via Tailwind
+   @theme or direct var()) instead of hardcoding color values.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --background: #f4f4f5; /* zinc-100 */
+  --surface: #ffffff;
+  --surface-raised: #fafafa;
+  --border: #e4e4e7; /* zinc-200 */
+  --border-subtle: #f1f1f1;
+
+  /* Text */
+  --text-primary: #18181b; /* zinc-900 */
+  --text-secondary: #71717a; /* zinc-500 */
+  --text-muted: #a1a1aa; /* zinc-400 */
+
+  /* Brand */
+  --brand: #2563eb; /* blue-600 */
+  --brand-hover: #1d4ed8; /* blue-700 */
+  --brand-subtle: #eff6ff; /* blue-50 */
+
+  /* Sidebar */
+  --sidebar-bg: #18181b; /* zinc-900 */
+  --sidebar-text: #d4d4d8; /* zinc-300 */
+  --sidebar-text-active: #ffffff;
+  --sidebar-hover: #27272a; /* zinc-800 */
+  --sidebar-active: #3f3f46; /* zinc-700 */
+  --sidebar-border: #27272a;
+
+  /* Financial P&L */
+  --color-gain: #16a34a; /* green-600 */
+  --color-gain-bg: #f0fdf4; /* green-50 */
+  --color-gain-border: #bbf7d0; /* green-200 */
+  --color-loss: #dc2626; /* red-600 */
+  --color-loss-bg: #fef2f2; /* red-50 */
+  --color-loss-border: #fecaca; /* red-200 */
+
+  /* Legacy compat */
+  --foreground: var(--text-primary);
 }
 
+.dark {
+  /* Surfaces */
+  --background: #09090b; /* zinc-950 */
+  --surface: #18181b; /* zinc-900 */
+  --surface-raised: #27272a; /* zinc-800 */
+  --border: #27272a; /* zinc-800 */
+  --border-subtle: #3f3f46; /* zinc-700 */
+
+  /* Text */
+  --text-primary: #fafafa; /* zinc-50 */
+  --text-secondary: #a1a1aa; /* zinc-400 */
+  --text-muted: #71717a; /* zinc-500 */
+
+  /* Brand */
+  --brand: #3b82f6; /* blue-500 */
+  --brand-hover: #2563eb; /* blue-600 */
+  --brand-subtle: #1e3a5f;
+
+  /* Sidebar */
+  --sidebar-bg: #09090b; /* zinc-950 */
+  --sidebar-text: #a1a1aa;
+  --sidebar-text-active: #fafafa;
+  --sidebar-hover: #18181b;
+  --sidebar-active: #27272a;
+  --sidebar-border: #18181b;
+
+  /* Financial P&L */
+  --color-gain: #4ade80; /* green-400 */
+  --color-gain-bg: #14532d33;
+  --color-gain-border: #166534;
+  --color-loss: #f87171; /* red-400 */
+  --color-loss-bg: #7f1d1d33;
+  --color-loss-border: #991b1b;
+
+  /* Legacy compat */
+  --foreground: var(--text-primary);
+}
+
+/* ============================================================
+   Tailwind v4 theme extension — exposes CSS vars as utilities.
+   Usage: text-gain, bg-gain-subtle, text-loss, border-gain, etc.
+   ============================================================ */
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-subtle: var(--brand-subtle);
+
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-text-active: var(--sidebar-text-active);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --color-gain: var(--color-gain);
+  --color-gain-bg: var(--color-gain-bg);
+  --color-gain-border: var(--color-gain-border);
+  --color-loss: var(--color-loss);
+  --color-loss-bg: var(--color-loss-bg);
+  --color-loss-border: var(--color-loss-border);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   Base styles
+   ============================================================ */
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus ring reset — handled per-component */
+*:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar — subtle, matches surface */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
