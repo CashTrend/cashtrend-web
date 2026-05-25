@@ -32,7 +32,7 @@ export async function POST(): Promise<NextResponse> {
 
   let response: Response
   try {
-    response = await fetch(`${backendUrl}/api/users/api/token/refresh/`, {
+    response = await fetch(`${backendUrl}/api/users/api/token/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh: refreshToken }),
