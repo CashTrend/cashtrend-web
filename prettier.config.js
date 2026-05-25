@@ -1,5 +1,6 @@
 // prettier.config.js
-export default prettierConfig = {
+/** @type {import('prettier').Config} */
+const prettierConfig = {
   // Usa comillas simples en lugar de dobles
   singleQuote: true,
 
@@ -24,3 +25,5 @@ export default prettierConfig = {
   // Compatibilidad con JSX
   jsxSingleQuote: false,
 }
+
+export default prettierConfig
