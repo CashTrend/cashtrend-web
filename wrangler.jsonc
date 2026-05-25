@@ -1,0 +1,8 @@
+{
+  // Wrangler configuration for Cloudflare Pages + OpenNext
+  // https://opennext.js.org/cloudflare
+  "name": "cashtrend-web",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": ".open-next/assets"
+}
