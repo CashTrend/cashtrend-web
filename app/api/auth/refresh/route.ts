@@ -19,8 +19,6 @@ import {
 } from '@/lib/auth/session'
 import type { TokenRefreshResponse } from '@/lib/types'
 
-export const runtime = 'edge'
-
 export async function POST(): Promise<NextResponse> {
   const refreshToken = await getRefreshTokenFromCookie()
 

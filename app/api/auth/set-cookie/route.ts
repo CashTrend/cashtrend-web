@@ -14,8 +14,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { setRefreshTokenCookie, setUserCookie } from '@/lib/auth/session'
 import type { User } from '@/lib/types'
 
-export const runtime = 'edge'
-
 export async function POST(request: NextRequest): Promise<NextResponse> {
   let body: unknown
 
