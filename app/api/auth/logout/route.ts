@@ -11,6 +11,8 @@
 import { NextResponse } from 'next/server'
 import { clearRefreshTokenCookie, clearUserCookie } from '@/lib/auth/session'
 
+export const runtime = 'edge'
+
 export async function POST(): Promise<NextResponse> {
   await clearRefreshTokenCookie()
   await clearUserCookie()

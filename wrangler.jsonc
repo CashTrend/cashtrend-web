@@ -1,13 +1,8 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  // Wrangler configuration for Cloudflare Workers + OpenNext
-  // https://opennext.js.org/cloudflare/get-started
+  // Wrangler configuration for Cloudflare Pages + OpenNext
+  // https://opennext.js.org/cloudflare
   "name": "cashtrend-web",
-  "main": ".open-next/worker.js",
   "compatibility_date": "2025-04-01",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
-  }
+  "pages_build_output_dir": ".open-next/assets"
 }
