@@ -5,8 +5,8 @@
   "scripts": {
     "prepare": "husky",
     "dev": "next dev",
-    "build": "next build",
-    "build:cf": "opennextjs-cloudflare build",
+    "build": "opennextjs-cloudflare build",
+    "build:next": "next build",
     "preview": "opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "eslint . --fix"
