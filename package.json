@@ -2,6 +2,10 @@
   "name": "cashtrend-web",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "prepare": "husky",
     "dev": "next dev",
@@ -35,7 +39,7 @@
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
-    "eslint-config-next": "16.1.1",
+    "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
