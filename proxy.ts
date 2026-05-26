@@ -1,5 +1,8 @@
 /**
- * Next.js Middleware — route protection.
+ * Next.js Proxy (formerly Middleware) — route protection.
+ *
+ * Renamed from middleware.ts to proxy.ts per Next.js 16 convention.
+ * See: https://nextjs.org/docs/messages/middleware-to-proxy
  *
  * Rules:
  *   - Unauthenticated users (no refresh cookie) are redirected to /login
