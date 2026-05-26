@@ -15,7 +15,7 @@ import {
   signOut as fbSignOut,
   type UserCredential,
 } from 'firebase/auth'
-import { getFirebaseAuth } from '@/lib/auth/firebase'
+import { firebaseAuth } from '@/lib/auth/firebase'
 
 /** Human-readable messages for common Firebase Auth error codes. */
 const FIREBASE_ERROR_MESSAGES: Record<string, string> = {
@@ -57,7 +57,7 @@ function toReadableError(error: unknown): string {
  */
 export async function firebaseSignIn(email: string, password: string): Promise<UserCredential> {
   try {
-    return await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
+    return await signInWithEmailAndPassword(firebaseAuth, email, password)
   } catch (error) {
     throw new Error(toReadableError(error))
   }
@@ -73,7 +73,7 @@ export async function firebaseSignIn(email: string, password: string): Promise<U
  */
 export async function firebaseSignUp(email: string, password: string): Promise<UserCredential> {
   try {
-    return await createUserWithEmailAndPassword(getFirebaseAuth(), email, password)
+    return await createUserWithEmailAndPassword(firebaseAuth, email, password)
   } catch (error) {
     throw new Error(toReadableError(error))
   }
@@ -86,7 +86,7 @@ export async function firebaseSignUp(email: string, password: string): Promise<U
  */
 export async function firebaseSignOut(): Promise<void> {
   try {
-    await fbSignOut(getFirebaseAuth())
+    await fbSignOut(firebaseAuth)
   } catch {
     // Sign-out errors are non-critical — swallow and continue
   }

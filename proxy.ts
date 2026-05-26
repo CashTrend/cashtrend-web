@@ -1,17 +1,15 @@
 /**
- * Next.js Middleware — route protection.
+ * Next.js Proxy (formerly Middleware) — route protection.
  *
- * OpenNext requires this file to be named middleware.ts with the export named
- * "middleware" so it can be packaged as an edge Worker on Cloudflare.
- * Next.js 16 treats "middleware" as deprecated (renamed to "proxy") but still
- * compiles it. The deprecation warning during build is expected and harmless.
+ * Renamed from middleware.ts to proxy.ts per Next.js 16 convention.
+ * See: https://nextjs.org/docs/messages/middleware-to-proxy
  *
  * Rules:
  *   - Unauthenticated users (no refresh cookie) are redirected to /login
  *     when they try to access any route under (dashboard).
  *   - Authenticated users (refresh cookie present) are redirected from
  *     /login and /register to / (dashboard).
- *   - /api/* routes are always allowed through (they manage the cookie).
+ *   - /api/auth/* routes are always allowed through (they manage the cookie).
  *
  * Note: The presence of the cookie is used as a proxy for "authenticated".
  * The cookie's actual validity is verified by the Route Handler on first use.
@@ -27,7 +25,7 @@ const PUBLIC_PATHS = ['/login', '/register']
 /** Route prefixes that are always allowed (API, Next internals). */
 const ALWAYS_ALLOWED_PREFIXES = ['/api/', '/_next/', '/favicon.ico']
 
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl
 
   // Always allow internal and API routes
