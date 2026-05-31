@@ -16,13 +16,16 @@ import type { AuthResponse, LoginRequest, RegisterRequest, TokenRefreshResponse 
 
 /**
  * Authenticate an existing user against the backend.
- * The caller must obtain `user_auth_id` from Firebase Auth before calling this.
+ *
+ * Only the Firebase UID is needed — username is not required for login so that
+ * users can sign in from any device or browser without relying on locally
+ * stored data. The backend looks up the account exclusively by user_auth_id.
  *
  * On success, automatically stores the access token in memory.
  * The caller is responsible for persisting the refresh token via the
  * /api/auth/set-cookie Route Handler.
  *
- * @param payload - Login credentials
+ * @param payload - Login credentials containing only user_auth_id
  * @returns AuthResponse containing tokens and user data
  */
 export async function login(payload: LoginRequest): Promise<AuthResponse> {

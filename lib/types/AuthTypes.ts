@@ -17,10 +17,15 @@ export interface AuthResponse {
   user: User
 }
 
-/** Request body for POST /api/users/login */
+/**
+ * Request body for POST /api/users/login.
+ *
+ * Only the Firebase UID is required. Username is NOT sent during login so
+ * that users can authenticate from any device without relying on data that
+ * was previously stored in localStorage on a specific browser.
+ */
 export interface LoginRequest {
   user_auth_id: string
-  username: string
 }
 
 /** Request body for POST /api/users/register */
