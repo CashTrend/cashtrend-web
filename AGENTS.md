@@ -124,7 +124,7 @@ cashtrend-web/
 
 ```
 User → Firebase Auth (email/password) → Firebase UID
-     → Backend POST /api/users/login { user_auth_id, username } → JWT { access, refresh, user }
+     → Backend POST /api/users/login { user_auth_id } → JWT { access, refresh, user }
      → Access token stored in memory (module-level variable in http.ts)
      → Refresh token stored in httpOnly cookie (via /api/auth/set-cookie Route Handler)
      → User profile stored in JS-readable cookie (cashtrend_user)
@@ -132,6 +132,7 @@ User → Firebase Auth (email/password) → Firebase UID
 
 - **Firebase** handles identity verification (client-side)
 - **Django backend** issues JWT tokens after verifying the Firebase UID
+- **Only `user_auth_id` is sent at login** — `username` is NOT required and NOT sent. The backend looks up the user exclusively by UID, so login works from any device or browser without relying on locally stored data.
 - **Access token** is kept in-memory only (never in localStorage/sessionStorage)
 - **Refresh token** is in an httpOnly cookie managed by Next.js Route Handlers
 - On 401 responses, the HTTP client automatically attempts a silent token refresh
@@ -276,9 +277,12 @@ interface AuthResponse {
   user: User
 }
 
-interface LoginRequest {
+/** Request body for POST /api/users/login.
+ * Only user_auth_id is required — username is NOT sent at login.
+ * The backend looks up the account by UID alone so login works from any device.
+ */
+export interface LoginRequest {
   user_auth_id: string
-  username: string
 }
 
 interface RegisterRequest {
@@ -455,7 +459,29 @@ pnpm start
 
 # Lint and auto-fix
 pnpm lint
+
+# Full quality-gate check (auto-fix + verify + typecheck)
+# Cross-platform — works on Windows, Linux, macOS
+pnpm check            # ESLint + tsc
+pnpm check:full       # ESLint + tsc + next build (slow)
+
+# TypeScript typecheck only
+pnpm typecheck
+
+# Run the check script directly (same as pnpm check)
+node scripts/check.mjs
+node scripts/check.mjs --build
 ```
+
+### Quality-gate script details
+
+`scripts/check.mjs` runs in order:
+1. `eslint . --fix` — lint with auto-fix
+2. `eslint .` — verify no remaining errors
+3. `tsc --noEmit --project tsconfig.check.json` — TypeScript type-check (excludes `.next/` generated files)
+4. `next build` — production build (only with `--build` flag)
+
+`tsconfig.check.json` extends `tsconfig.json` but excludes `.next/` to avoid false type errors from Next.js-generated validator files (e.g. for rewrite-based proxy routes that have no corresponding `route.ts` file).
 
 ---
 
@@ -530,6 +556,8 @@ pnpm lint
 8. **Debounce search inputs** (300ms) to avoid excessive API calls
 9. **Parallel data fetching** — use `Promise.all` for independent API calls on page load
 10. **Handle 204 No Content** — DELETE responses return `undefined`, not JSON
+11. **Never send `username` in the login request** — `LoginRequest` only has `user_auth_id`. Login works from any device without localStorage data.
+12. **Run `pnpm check` before committing** — catches lint and type errors that pre-commit hooks may not cover.
 
 ---
 

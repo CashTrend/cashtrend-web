@@ -11,7 +11,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "typecheck": "tsc --noEmit --project tsconfig.check.json",
+    "check": "node scripts/check.mjs",
+    "check:full": "node scripts/check.mjs --build"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
