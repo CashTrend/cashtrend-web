@@ -123,6 +123,7 @@ export interface Translation {
     search_placeholder: string
     search_aria: string
     search_prompt: string
+    search_min_chars: string
     search_error: string
     search_no_results: string
     autocomplete_label: string

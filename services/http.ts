@@ -91,6 +91,14 @@ function getBaseUrl(): string {
 /**
  * Internal fetch wrapper.
  * Attaches the Authorization header and handles 401 with automatic token refresh.
+ *
+ * @param path          - API path (e.g. '/api/tickers/search?query=AAPL')
+ * @param options       - Standard RequestInit options (method, body, signal, …)
+ * @param authenticated - Whether to attach the Bearer token (default: true)
+ *
+ * Passing an AbortSignal via `options.signal` allows the caller to cancel the
+ * request at any time (e.g. when a new search query supersedes the previous one).
+ * AbortErrors propagate naturally — callers should catch and ignore them.
  */
 async function request<T>(
   path: string,
@@ -110,6 +118,7 @@ async function request<T>(
     headers.set('Content-Type', 'application/json')
   }
 
+  // options.signal (if provided) flows through to fetch() automatically via spread
   const response = await fetch(url, { ...options, headers })
 
   // Happy path
@@ -130,6 +139,7 @@ async function request<T>(
           resolve: async (newToken: string) => {
             headers.set('Authorization', `Bearer ${newToken}`)
             try {
+              // Re-use the original signal so an abort cancels the retry too
               const retryRes = await fetch(url, { ...options, headers })
               if (retryRes.ok) {
                 resolve(retryRes.status === 204 ? (undefined as T) : retryRes.json())
@@ -161,19 +171,27 @@ async function request<T>(
       }
 
       throw new HttpError(retryResponse.status, await retryResponse.json())
-    } catch {
+    } catch (err) {
       isRefreshing = false
-      // Reject all queued requests so their Promises don't hang forever
-      const err = new Error('Session expired. Please log in again.')
-      onRefreshFailed(err)
 
-      // Refresh failed — clear the stale token and redirect to login
+      // If the request was intentionally aborted (e.g. a new search query
+      // superseded this one), do NOT treat it as a session expiry.
+      // Reject queued subscribers with the abort error so their Promises
+      // resolve cleanly, then rethrow so the caller's AbortError handler runs.
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        onRefreshFailed(err as Error)
+        throw err
+      }
+
+      // Genuine refresh failure — clear the stale token and redirect to login.
+      // Reject all queued requests so their Promises don't hang forever.
+      const sessionErr = new Error('Session expired. Please log in again.')
+      onRefreshFailed(sessionErr)
       clearAccessToken()
       if (typeof window !== 'undefined') {
         window.location.href = '/login'
       }
-
-      throw err
+      throw sessionErr
     }
   }
 
@@ -204,18 +222,29 @@ export class HttpError extends Error {
 /**
  * HTTP client — use these methods in service files.
  * All methods are generic: pass the expected response type as T.
+ *
+ * Every method accepts an optional `AbortSignal` as its last parameter.
+ * Pass a signal from an AbortController to cancel an in-flight request:
+ *
+ *   const controller = new AbortController()
+ *   http.get('/api/tickers/search', { query: 'AAPL' }, true, controller.signal)
+ *   controller.abort()  // cancels the fetch
+ *
+ * AbortErrors are NOT swallowed here — callers must catch and handle them.
  */
 export const http = {
   /**
    * GET request.
-   * @param path - API path (e.g. '/api/tickers/AAPL/detail')
-   * @param params - Optional query parameters
+   * @param path          - API path (e.g. '/api/tickers/AAPL/detail')
+   * @param params        - Optional query parameters
    * @param authenticated - Whether to attach the Bearer token (default: true)
+   * @param signal        - Optional AbortSignal to cancel the request
    */
   get<T>(
     path: string,
     params?: Record<string, string | number | boolean>,
-    authenticated = true
+    authenticated = true,
+    signal?: AbortSignal
   ): Promise<T> {
     const url = params
       ? `${path}?${new URLSearchParams(
@@ -226,21 +255,23 @@ export const http = {
           )
         ).toString()}`
       : path
-    return request<T>(url, { method: 'GET' }, authenticated)
+    return request<T>(url, { method: 'GET', signal }, authenticated)
   },
 
   /**
    * POST request with JSON or FormData body.
-   * @param path - API path
-   * @param body - Request body (will be JSON-serialized unless FormData)
+   * @param path          - API path
+   * @param body          - Request body (will be JSON-serialized unless FormData)
    * @param authenticated - Whether to attach the Bearer token (default: true)
+   * @param signal        - Optional AbortSignal to cancel the request
    */
-  post<T>(path: string, body?: unknown, authenticated = true): Promise<T> {
+  post<T>(path: string, body?: unknown, authenticated = true, signal?: AbortSignal): Promise<T> {
     return request<T>(
       path,
       {
         method: 'POST',
         body: body instanceof FormData ? body : JSON.stringify(body),
+        signal,
       },
       authenticated
     )
@@ -248,33 +279,38 @@ export const http = {
 
   /**
    * PUT request (full update).
-   * @param path - API path
-   * @param body - Full replacement body
+   * @param path   - API path
+   * @param body   - Full replacement body
+   * @param signal - Optional AbortSignal to cancel the request
    */
-  put<T>(path: string, body?: unknown): Promise<T> {
+  put<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
     return request<T>(path, {
       method: 'PUT',
       body: JSON.stringify(body),
+      signal,
     })
   },
 
   /**
    * PATCH request (partial update).
-   * @param path - API path
-   * @param body - Partial update body
+   * @param path   - API path
+   * @param body   - Partial update body
+   * @param signal - Optional AbortSignal to cancel the request
    */
-  patch<T>(path: string, body?: unknown): Promise<T> {
+  patch<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
     return request<T>(path, {
       method: 'PATCH',
       body: JSON.stringify(body),
+      signal,
     })
   },
 
   /**
    * DELETE request.
-   * @param path - API path
+   * @param path   - API path
+   * @param signal - Optional AbortSignal to cancel the request
    */
-  del<T = void>(path: string): Promise<T> {
-    return request<T>(path, { method: 'DELETE' })
+  del<T = void>(path: string, signal?: AbortSignal): Promise<T> {
+    return request<T>(path, { method: 'DELETE', signal })
   },
 }

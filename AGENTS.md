@@ -64,7 +64,7 @@ cashtrend-web/
 │   │   │   ├── new/page.tsx    # Create new transaction form
 │   │   │   └── [id]/edit/      # Edit transaction form (dynamic route)
 │   │   └── tickers/            # Ticker pages
-│   │       ├── page.tsx        # Ticker search (debounced, 300ms)
+│   │       ├── page.tsx        # Ticker search (debounced, 500ms, min 3 chars)
 │   │       └── [symbol]/       # Ticker detail (5 tabbed views)
 │   ├── api/                    # Next.js Route Handlers (server-only)
 │   │   └── auth/               # Auth API routes
@@ -553,7 +553,7 @@ node scripts/check.mjs --build
 5. **All data is user-scoped** — no cross-user access at the API level
 6. **Use `cn()` helper** for conditional Tailwind class merging
 7. **Use CSS custom properties** for theme colors — never hardcode hex values
-8. **Debounce search inputs** (300ms) to avoid excessive API calls
+8. **Debounce search inputs** — ticker search uses 500ms debounce + 3-character minimum (`TICKER_SEARCH_DEBOUNCE_MS` / `TICKER_SEARCH_MIN_LENGTH` in `lib/constants.ts`). Both components (`tickers/page.tsx`, `TickerAutocomplete.tsx`) use `AbortController` to cancel in-flight requests when a new query supersedes the previous one. Always add an unmount cleanup effect (`useEffect(() => () => abortRef.current?.abort(), [])`) alongside the search effect.
 9. **Parallel data fetching** — use `Promise.all` for independent API calls on page load
 10. **Handle 204 No Content** — DELETE responses return `undefined`, not JSON
 11. **Never send `username` in the login request** — `LoginRequest` only has `user_auth_id`. Login works from any device without localStorage data.

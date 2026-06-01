@@ -4,20 +4,32 @@
  * Tickers search page — live search with debounce, result cards.
  *
  * Behaviour:
- *   - Input with 300ms debounce calls searchTickers()
+ *   - Search only fires when the query reaches 3 characters (avoids costly
+ *     single/double-character searches that hit Yahoo Finance).
+ *   - 500ms debounce: the timer is reset on every keystroke so the fetch only
+ *     fires after the user pauses for half a second.
+ *   - AbortController: each new search aborts the previous in-flight HTTP
+ *     request, preventing stale results from overwriting fresh ones and
+ *     reducing unnecessary backend load.
  *   - Results shown as clickable cards → /tickers/[symbol]
- *   - Empty state when query is blank; "no results" when search returns []
- *   - Loading spinner while fetching
+ *   - Empty/error/no-results states are gated on `searched` to avoid flashing.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Search, Loader2, TrendingUp } from 'lucide-react'
 import { searchTickers } from '@/services/tickers.service'
 import { useLocale } from '@/context/locale-context'
 import { interpolate } from '@/lib/i18n/types'
 import { cn } from '@/lib/utils'
+import { TICKER_SEARCH_MIN_LENGTH, TICKER_SEARCH_DEBOUNCE_MS } from '@/lib/constants'
 import type { Ticker } from '@/lib/types'
+
+/** Minimum query length before a search is dispatched to the backend. */
+const MIN_SEARCH_LENGTH = TICKER_SEARCH_MIN_LENGTH
+
+/** Milliseconds of inactivity after the last keystroke before the fetch fires. */
+const SEARCH_DEBOUNCE_MS = TICKER_SEARCH_DEBOUNCE_MS
 
 export default function TickersPage() {
   const { t } = useLocale()
@@ -27,35 +39,65 @@ export default function TickersPage() {
   const [searched, setSearched] = useState(false)
   const [searchError, setSearchError] = useState(false)
 
+  // Holds the AbortController for the most recent in-flight search request.
+  // Calling .abort() on it cancels the fetch so the response is discarded.
+  const abortRef = useRef<AbortController | null>(null)
+
+  // Abort any in-flight request when the component unmounts (e.g. the user
+  // navigates away mid-search).  Prevents the completed fetch from trying to
+  // call setState on an unmounted component and wastes no backend resources.
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort()
+    }
+  }, [])
+
   useEffect(() => {
     const trimmed = query.trim()
 
-    const timer = setTimeout(
-      async () => {
-        if (trimmed.length === 0) {
-          setResults([])
-          setSearched(false)
-          setSearchError(false)
-          setLoading(false)
-          return
-        }
-        setLoading(true)
-        setSearchError(false)
-        try {
-          const data = await searchTickers(trimmed)
-          setResults(data)
-          setSearched(true)
-        } catch {
-          setResults([])
-          setSearched(true)
-          setSearchError(true)
-        } finally {
-          setLoading(false)
-        }
-      },
-      trimmed.length === 0 ? 0 : 300
-    )
+    // Use a timer even for the early-return case so setState calls happen
+    // inside a callback (avoids the react-hooks/set-state-in-effect lint rule).
+    const delay = trimmed.length < MIN_SEARCH_LENGTH ? 0 : SEARCH_DEBOUNCE_MS
 
+    const timer = setTimeout(async () => {
+      // Below the minimum length: reset UI and don't fetch.
+      if (trimmed.length < MIN_SEARCH_LENGTH) {
+        abortRef.current?.abort()
+        setResults([])
+        setSearched(false)
+        setSearchError(false)
+        setLoading(false)
+        return
+      }
+
+      // Cancel any previous in-flight request before starting a new one.
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+
+      setLoading(true)
+      setSearchError(false)
+
+      try {
+        const data = await searchTickers(trimmed, controller.signal)
+        setResults(data)
+        setSearched(true)
+      } catch (err) {
+        // AbortError is expected when a newer search supersedes this one —
+        // silently discard it so we don't show a spurious error to the user.
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setResults([])
+        setSearched(true)
+        setSearchError(true)
+      } finally {
+        // Only clear loading if this controller wasn't already superseded.
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      }
+    }, delay)
+
+    // Cleanup: cancel the pending timer if the query changes before it fires.
     return () => clearTimeout(timer)
   }, [query])
 
@@ -87,6 +129,11 @@ export default function TickersPage() {
 
       {/* Results */}
       {!query.trim() && <p className="text-sm text-text-muted">{t.tickers.search_prompt}</p>}
+
+      {/* Hint shown while the user hasn't reached the minimum length yet */}
+      {query.trim().length > 0 && query.trim().length < MIN_SEARCH_LENGTH && (
+        <p className="text-sm text-text-muted">{t.tickers.search_min_chars}</p>
+      )}
 
       {searched && !loading && searchError && (
         <p className="text-sm text-loss">{t.tickers.search_error}</p>

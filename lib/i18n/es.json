@@ -106,6 +106,7 @@
     "search_placeholder": "Buscar por s\u00edmbolo o nombre de empresa\u2026",
     "search_aria": "Buscar activos",
     "search_prompt": "Escrib\u00ed un s\u00edmbolo o nombre de empresa para buscar.",
+    "search_min_chars": "Escrib\u00ed al menos 3 caracteres para buscar.",
     "search_error": "Error en la b\u00fasqueda. Revis\u00e1 tu conexi\u00f3n y volvelo a intentar.",
     "search_no_results": "Sin resultados para \u201c{{query}}\u201d.",
     "autocomplete_label": "Buscar activo",

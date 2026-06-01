@@ -106,6 +106,7 @@
     "search_placeholder": "Search by symbol or company name\u2026",
     "search_aria": "Search tickers",
     "search_prompt": "Type a symbol or company name to search.",
+    "search_min_chars": "Type at least 3 characters to search.",
     "search_error": "Search failed. Check your connection and try again.",
     "search_no_results": "No results for \u201c{{query}}\u201d.",
     "autocomplete_label": "Search ticker",

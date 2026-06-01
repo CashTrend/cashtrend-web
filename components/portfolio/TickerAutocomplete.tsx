@@ -4,11 +4,15 @@
  * TickerAutocomplete — search input with live dropdown for ticker symbols.
  *
  * Behaviour:
- *   - Calls searchTickers() with 300ms debounce after the user types ≥ 1 char
- *   - Shows a loading spinner, results list, or a "no results" message
- *   - Selecting a result calls onSelect(ticker) and closes the dropdown
- *   - Clicking outside closes the dropdown
- *   - Controlled: value / onSelect props drive the selected state
+ *   - Search only fires when the query reaches MIN_SEARCH_LENGTH (3) characters,
+ *     avoiding costly single/double-character round-trips to Yahoo Finance.
+ *   - 500ms debounce: the timer resets on every keystroke so the fetch only
+ *     fires after the user pauses for half a second.
+ *   - AbortController: each new search aborts the previous in-flight request,
+ *     preventing stale results from overwriting fresh ones.
+ *   - Selecting a result calls onSelect(ticker) and closes the dropdown.
+ *   - Clicking outside closes the dropdown.
+ *   - Controlled: value / onSelect props drive the selected state.
  *
  * Usage:
  *   <TickerAutocomplete
@@ -24,7 +28,14 @@ import { searchTickers } from '@/services/tickers.service'
 import { useLocale } from '@/context/locale-context'
 import { interpolate } from '@/lib/i18n/types'
 import { cn } from '@/lib/utils'
+import { TICKER_SEARCH_MIN_LENGTH, TICKER_SEARCH_DEBOUNCE_MS } from '@/lib/constants'
 import type { Ticker } from '@/lib/types'
+
+/** Minimum query length before a search is dispatched to the backend. */
+const MIN_SEARCH_LENGTH = TICKER_SEARCH_MIN_LENGTH
+
+/** Milliseconds of inactivity after the last keystroke before the fetch fires. */
+const SEARCH_DEBOUNCE_MS = TICKER_SEARCH_DEBOUNCE_MS
 
 interface TickerAutocompleteProps {
   /** Currently selected ticker symbol (controlled). */
@@ -62,6 +73,19 @@ export function TickerAutocomplete({
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
 
+  // Holds the AbortController for the most recent in-flight search request.
+  // Calling .abort() cancels the fetch so stale responses are discarded.
+  const abortRef = useRef<AbortController | null>(null)
+
+  // Abort any in-flight request when the component unmounts (e.g. the user
+  // navigates away or the form is closed mid-search).  Prevents the completed
+  // fetch from calling setState on an unmounted component.
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort()
+    }
+  }, [])
+
   const resolvedLabel = label ?? t.tickers.autocomplete_label
 
   // Close dropdown on outside click
@@ -75,32 +99,52 @@ export function TickerAutocomplete({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Debounced search
+  // Debounced search with minimum length guard and AbortController
   useEffect(() => {
     const trimmed = query.trim()
 
-    const timer = setTimeout(
-      async () => {
-        if (trimmed.length === 0) {
-          setResults([])
-          setIsOpen(false)
-          return
-        }
-        setIsLoading(true)
-        try {
-          const data = await searchTickers(trimmed)
-          setResults(data)
-          setIsOpen(true)
-          setActiveIndex(-1)
-        } catch {
-          setResults([])
-        } finally {
+    // Use a timer even for the early-return case so setState calls happen
+    // inside a callback (avoids the react-hooks/set-state-in-effect lint rule).
+    const delay = trimmed.length < MIN_SEARCH_LENGTH ? 0 : SEARCH_DEBOUNCE_MS
+
+    const timer = setTimeout(async () => {
+      // Below the minimum length: reset dropdown immediately without fetching.
+      if (trimmed.length < MIN_SEARCH_LENGTH) {
+        abortRef.current?.abort()
+        setResults([])
+        setIsOpen(false)
+        setIsLoading(false)
+        return
+      }
+
+      // Cancel any previous in-flight request before starting a new one.
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+
+      setIsLoading(true)
+
+      try {
+        const data = await searchTickers(trimmed, controller.signal)
+        setResults(data)
+        setIsOpen(true)
+        setActiveIndex(-1)
+      } catch (err) {
+        // AbortError is expected when a newer search supersedes this one —
+        // silently discard it so the dropdown doesn't flash or close unexpectedly.
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setResults([])
+        // Keep isOpen false — the user sees an empty dropdown on error,
+        // consistent with the previous behaviour.
+      } finally {
+        // Only clear loading if this controller wasn't already superseded.
+        if (!controller.signal.aborted) {
           setIsLoading(false)
         }
-      },
-      trimmed.length === 0 ? 0 : 300
-    )
+      }
+    }, delay)
 
+    // Cleanup: cancel the pending timer if the query changes before it fires.
     return () => clearTimeout(timer)
   }, [query])
 
@@ -247,3 +291,4 @@ export function TickerAutocomplete({
     </div>
   )
 }
+

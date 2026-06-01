@@ -30,11 +30,15 @@ import type {
  * Returns up to 8 results. Falls back to live Yahoo Finance search if
  * fewer than 8 DB results are found.
  *
- * @param query - Partial symbol or company name (e.g. 'AAPL', 'Apple')
+ * Pass an AbortSignal to cancel an in-flight search when the query changes
+ * (e.g. from an AbortController tied to a useEffect cleanup).
+ *
+ * @param query  - Partial symbol or company name (e.g. 'AAPL', 'Apple')
+ * @param signal - Optional AbortSignal to cancel the request mid-flight
  * @returns Array of matching tickers
  */
-export async function searchTickers(query: string): Promise<Ticker[]> {
-  return http.get<Ticker[]>('/api/tickers/search', { query })
+export async function searchTickers(query: string, signal?: AbortSignal): Promise<Ticker[]> {
+  return http.get<Ticker[]>('/api/tickers/search', { query }, true, signal)
 }
 
 /**
