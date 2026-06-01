@@ -53,7 +53,7 @@ export default function DashboardPage() {
   const { isLoading: authLoading } = useAuth()
   const { t } = useLocale()
   const [summary, setSummary] = useState<PortfolioSummary | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(authLoading)
   const [error, setError] = useState<string | null>(null)
 
   // Stable refs to setters — avoids re-running the effect when state changes

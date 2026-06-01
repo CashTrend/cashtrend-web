@@ -558,6 +558,8 @@ node scripts/check.mjs --build
 10. **Handle 204 No Content** — DELETE responses return `undefined`, not JSON
 11. **Never send `username` in the login request** — `LoginRequest` only has `user_auth_id`. Login works from any device without localStorage data.
 12. **Run `pnpm check` before committing** — catches lint and type errors that pre-commit hooks may not cover.
+13. **`logout()` always completes** — `firebaseSignOut()` is wrapped in `try/catch` in `auth-context.tsx`. Cookie clearing and redirect execute regardless of Firebase availability. Never move cookie clearing or `window.location.href` inside the try block.
+14. **Ticker filter is case-insensitive** — portfolio page uses `.toLowerCase()` on both sides of the `includes()` check. Always maintain case-insensitive matching for symbol lookups in client-side filtering.
 
 ---
 
@@ -621,3 +623,43 @@ node scripts/check.mjs --build
 ---
 
 *Last updated: May 2026*
+
+---
+
+## 20. CEDEAR Support
+
+CEDEARs are Argentine Deposit Certificates trading on the Buenos Aires Stock Exchange in ARS. The frontend handles them as a distinct currency/type variant.
+
+### Types
+
+- `Ticker.currency: string` — `"USD"` (default) or `"ARS"` (CEDEARs).
+- `Ticker.conversion_ratio: string | null` — decimals as string; null for non-CEDEARs.
+- `Ticker.type: string` — `"CEDEAR"` when marked via the backend endpoint.
+- `TickerDetail.tickerratios_set: TickerRatios | null` — null for CEDEARs (no ratios record).
+- `Holding.currency: string` — `"ARS"` or `"USD"`, used for price formatting.
+- `TransactionTicker.currency: string` — same.
+
+### Service
+
+`tickers.service.ts` exposes `markAsCedear(symbol, conversionRatio)` which calls `PATCH /api/tickers/{symbol}/mark-cedear`.
+
+### Display Rules
+
+| Column | USD Ticker | ARS (CEDEAR) Ticker |
+|--------|-----------|---------------------|
+| Avg Buy Price | `$1,234.56` | `1,234.56 ARS` |
+| Total Invested | `$1,234.56` | `1,234.56 ARS` |
+| Current Price | `$1,234.56` | `1,234.56 ARS` |
+| Current Value | `$1,234.56` | `$1,234.56` (USD via FX) or `—` |
+
+- `formatPrice(value, currency)` in `HoldingsTable.tsx` handles ARS vs USD formatting.
+- `formatCurrency` is only used for Current Value (always USD from backend).
+- CEDEAR badge (`amber` color) shown when `h.currency === 'ARS'` in holdings or `type === 'CEDEAR'` in detail.
+
+### RatiosTab Null Handling
+
+`RatiosTab` accepts `ratios: TickerRatios | null | undefined` and renders a "no data" message when null. No crash risk.
+
+### Mark as CEDEAR Form
+
+Ticker detail page has an inline form (toggle link) to call `markAsCedear()`. On success, patches in-memory `pageData.detail` — the `tickerratios_set` from the existing detail is preserved since the backend response may return null for it.

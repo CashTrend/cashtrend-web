@@ -115,19 +115,27 @@ export function AuthProvider({ children, initialUser = null }: AuthProviderProps
   }, [initialUser])
 
   const logout = useCallback(async () => {
-    // 1. Sign out of Firebase
-    await firebaseSignOut()
+    // 1. Sign out of Firebase.
+    //    Wrapped in try/catch so that a Firebase network error (e.g. the SDK
+    //    is temporarily unavailable) does not abort the remaining cleanup steps.
+    //    Leaving the httpOnly refresh cookie alive would allow further backend
+    //    API calls even after the user believes they have logged out.
+    try {
+      await firebaseSignOut()
+    } catch {
+      // Ignore — always proceed to clear the local session regardless.
+    }
 
-    // 2. Clear the httpOnly refresh cookie
+    // 2. Clear the httpOnly refresh cookie via the Next.js Route Handler.
     await fetch('/api/auth/logout', { method: 'POST' })
 
-    // 3. Clear the in-memory access token
+    // 3. Clear the in-memory access token.
     clearAccessToken()
 
-    // 4. Clear user state
+    // 4. Clear user state.
     setUser(null)
 
-    // 5. Redirect to login (full navigation to clear any client state)
+    // 5. Redirect to login (full navigation to clear any remaining client state).
     window.location.href = '/login'
   }, [])
 

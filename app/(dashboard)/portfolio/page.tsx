@@ -43,7 +43,7 @@ export default function PortfolioPage() {
   const { isLoading: authLoading } = useAuth()
   const { t } = useLocale()
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(authLoading)
   const [error, setError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
@@ -91,7 +91,8 @@ export default function PortfolioPage() {
   // ── Client-side filtering ──
   const filtered = transactions.filter((tx) => {
     if (typeFilter !== 'ALL' && tx.transaction_type !== typeFilter) return false
-    if (tickerFilter && !tx.ticker?.symbol.includes(tickerFilter)) return false
+    if (tickerFilter && !tx.ticker?.symbol.toLowerCase().includes(tickerFilter.toLowerCase()))
+      return false
     return true
   })
 

@@ -20,6 +20,7 @@ import {
   getTickerIncome,
   getTickerBalance,
   getTickerCashflow,
+  markAsCedear,
 } from '@/services/tickers.service'
 import { RatiosTab } from '@/components/tickers/RatiosTab'
 import { HistoryTab } from '@/components/tickers/HistoryTab'
@@ -94,6 +95,12 @@ export default function TickerDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<TabId>('ratios')
+
+  // ── CEDEAR marking ──────────────────────────────────────────────────────────
+  const [cedearFormOpen, setCedearFormOpen] = useState(false)
+  const [cedearRatio, setCedearRatio] = useState('')
+  const [cedearLoading, setCedearLoading] = useState(false)
+  const [cedearError, setCedearError] = useState('')
 
   // ── Built inside component to access t ──
   const TABS: { id: TabId; label: string }[] = [
@@ -179,6 +186,37 @@ export default function TickerDetailPage() {
   const setErrorRef = useRef(setError)
   const setLoadingRef = useRef(setLoading)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+  // ── Mark ticker as CEDEAR ────────────────────────────────────────────────────
+  async function handleMarkCedear(e: React.FormEvent) {
+    e.preventDefault()
+    const ratio = cedearRatio.trim()
+    if (!ratio || isNaN(Number(ratio)) || Number(ratio) <= 0) {
+      setCedearError('Ingresá un ratio de conversión positivo (ej. 10).')
+      return
+    }
+    setCedearLoading(true)
+    setCedearError('')
+    try {
+      const updated = await markAsCedear(symbol, ratio)
+      // Patch the in-memory detail with the updated ticker data so the badge
+      // and conversion ratio appear immediately without a full page reload.
+      setPageData((prev) =>
+        prev
+          ? {
+              ...prev,
+              detail: { ...prev.detail, ...updated, tickerratios_set: prev.detail.tickerratios_set },
+            }
+          : prev
+      )
+      setCedearFormOpen(false)
+      setCedearRatio('')
+    } catch {
+      setCedearError('Error al guardar. Intentá de nuevo.')
+    } finally {
+      setCedearLoading(false)
+    }
+  }
 
   // ── Visible tabs — hide Income/Balance/Cashflow when data is null ──
   const visibleTabs = TABS.filter((tab) => {
@@ -273,6 +311,12 @@ export default function TickerDetailPage() {
           <div className="flex flex-wrap items-baseline gap-2">
             <h1 className="text-xl font-bold text-text-primary">{detail.symbol}</h1>
             <span className="text-sm text-text-secondary">{detail.name}</span>
+            {/* CEDEAR badge — shown when the ticker has been marked as a CEDEAR */}
+            {detail.type === 'CEDEAR' && (
+              <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                CEDEAR
+              </span>
+            )}
           </div>
 
           {(detail.sector || detail.industry) && (
@@ -281,11 +325,77 @@ export default function TickerDetailPage() {
             </p>
           )}
 
+          {/* Conversion ratio — only for CEDEARs */}
+          {detail.type === 'CEDEAR' && detail.conversion_ratio && (
+            <p className="text-xs text-text-muted">
+              Ratio de conversión:{' '}
+              <span className="font-semibold text-text-secondary">{detail.conversion_ratio}:1</span>
+              {' '}(cuántos CEDEAR = 1 acción subyacente)
+            </p>
+          )}
+
           {detail.description && (
             <p className="mt-1 line-clamp-2 max-w-2xl text-xs text-text-secondary">
               {detail.description}
             </p>
           )}
+
+          {/* ── Mark as CEDEAR section ── */}
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setCedearFormOpen((open) => !open)
+                setCedearError('')
+                // Pre-fill with current ratio if already a CEDEAR
+                if (!cedearFormOpen && detail.conversion_ratio) {
+                  setCedearRatio(detail.conversion_ratio)
+                }
+              }}
+              className="text-xs text-brand underline-offset-2 hover:underline"
+            >
+              {detail.type === 'CEDEAR' ? 'Editar ratio CEDEAR' : 'Marcar como CEDEAR'}
+            </button>
+
+            {cedearFormOpen && (
+              <form
+                onSubmit={handleMarkCedear}
+                className="mt-2 flex max-w-xs flex-col gap-2 rounded-lg border border-border bg-surface-raised p-3"
+              >
+                <label className="text-xs font-medium text-text-secondary">
+                  Ratio de conversión
+                  <span className="ml-1 font-normal text-text-muted">(N CEDEAR = 1 acción)</span>
+                </label>
+                <input
+                  type="number"
+                  step="0.0001"
+                  min="0.0001"
+                  value={cedearRatio}
+                  onChange={(e) => setCedearRatio(e.target.value)}
+                  placeholder="ej. 10"
+                  className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+                  required
+                />
+                {cedearError && <p className="text-xs text-loss">{cedearError}</p>}
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={cedearLoading}
+                    className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-hover disabled:opacity-50"
+                  >
+                    {cedearLoading ? 'Guardando…' : 'Guardar'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCedearFormOpen(false)}
+                    className="rounded-md px-3 py-1.5 text-xs text-text-secondary hover:text-text-primary"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       </div>
 

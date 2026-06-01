@@ -121,3 +121,22 @@ export async function getTickerBalance(symbol: string): Promise<TickerBalance[]>
 export async function getTickerCashflow(symbol: string): Promise<TickerCashFlow[]> {
   return http.get<TickerCashFlow[]>(`/api/tickers/${symbol}/cashflow`)
 }
+
+/**
+ * Mark an existing ticker as a CEDEAR (Argentine deposit certificate).
+ *
+ * Sets the ticker's type to "CEDEAR", currency to "ARS", and stores the
+ * conversion ratio — how many CEDEAR units equal one underlying foreign share.
+ *
+ * This action is reversible. Calling it again with a different conversion_ratio
+ * updates the stored value.
+ *
+ * @param symbol - Ticker symbol to mark (e.g. 'AAPL.BA')
+ * @param conversionRatio - Positive decimal string (e.g. '10' for 10:1 ratio)
+ * @returns Full updated ticker detail
+ */
+export async function markAsCedear(symbol: string, conversionRatio: string): Promise<TickerDetail> {
+  return http.patch<TickerDetail>(`/api/tickers/${symbol}/mark-cedear`, {
+    conversion_ratio: conversionRatio,
+  })
+}
