@@ -13,6 +13,13 @@ export interface Ticker {
   market: string
   industry: string
   sector: string
+  /** Currency in which the ticker's prices are denominated ('USD' or 'ARS'). */
+  currency: string
+  /**
+   * How many CEDEAR units represent one underlying foreign share.
+   * Null for non-CEDEAR tickers. Decimal as string.
+   */
+  conversion_ratio: string | null
 }
 
 /** Financial ratios — all fields nullable, decimals as strings. */
@@ -52,10 +59,22 @@ export interface TickerDetail {
   market: string
   industry: string
   sector: string
+  /** Currency in which the ticker's prices are denominated ('USD' or 'ARS'). */
+  currency: string
+  /**
+   * How many CEDEAR units represent one underlying foreign share.
+   * Null for non-CEDEAR tickers. Decimal as string.
+   */
+  conversion_ratio: string | null
   description: string
   created_date: string
   update_date: string
-  tickerratios_set: TickerRatios
+  /**
+   * Financial ratios for the ticker.
+   * Null for CEDEARs and tickers without a ratios record (e.g. some crypto).
+   * The RatiosTab renders a "no data" message when this is null.
+   */
+  tickerratios_set: TickerRatios | null
 }
 
 /** Single daily OHLC entry — decimals as strings. */

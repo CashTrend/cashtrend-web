@@ -14,6 +14,13 @@ export interface TransactionTicker {
   name: string
   type: string
   market: string
+  /** Currency in which the ticker's prices are denominated ('USD' or 'ARS'). */
+  currency: string
+  /**
+   * How many CEDEAR units represent one underlying foreign share.
+   * Null for non-CEDEAR tickers. Decimal as string.
+   */
+  conversion_ratio: string | null
 }
 
 /** A transaction as returned by the API (read shape). */
@@ -74,6 +81,11 @@ export interface TransactionListParams {
 export interface Holding {
   symbol: string
   ticker_name: string
+  /**
+   * Currency in which avg_buy_price and current_price are denominated ('USD' or 'ARS').
+   * Portfolio totals (total_invested, current_value, pnl_amount) are always in USD.
+   */
+  currency: string
   /** Decimal as string. */
   net_quantity: string
   /** Weighted average buy price. Decimal as string. */
