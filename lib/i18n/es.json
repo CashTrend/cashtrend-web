@@ -42,6 +42,8 @@
     "open_positions": "Posiciones Abiertas",
     "holding_singular": "posici\u00f3n",
     "holding_plural": "posiciones",
+    "show_ars": "Ver en ARS",
+    "show_usd": "Ver en USD",
     "error": "No se pudo cargar el portafolio."
   },
   "portfolio": {

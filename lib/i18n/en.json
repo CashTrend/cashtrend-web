@@ -42,6 +42,8 @@
     "open_positions": "Open Positions",
     "holding_singular": "holding",
     "holding_plural": "holdings",
+    "show_ars": "Show in ARS",
+    "show_usd": "Show in USD",
     "error": "Could not load portfolio data."
   },
   "portfolio": {

@@ -13,13 +13,14 @@ export interface Ticker {
   market: string
   industry: string
   sector: string
-  /** Currency in which the ticker's prices are denominated ('USD' or 'ARS'). */
   currency: string
   /**
    * How many CEDEAR units represent one underlying foreign share.
    * Null for non-CEDEAR tickers. Decimal as string.
    */
   conversion_ratio: string | null
+  /** True when this ticker is a CEDEAR. */
+  is_cedear: boolean
 }
 
 /** Financial ratios — all fields nullable, decimals as strings. */
@@ -59,13 +60,14 @@ export interface TickerDetail {
   market: string
   industry: string
   sector: string
-  /** Currency in which the ticker's prices are denominated ('USD' or 'ARS'). */
   currency: string
   /**
    * How many CEDEAR units represent one underlying foreign share.
    * Null for non-CEDEAR tickers. Decimal as string.
    */
   conversion_ratio: string | null
+  /** True when this ticker is a CEDEAR. */
+  is_cedear: boolean
   description: string
   created_date: string
   update_date: string

@@ -32,10 +32,13 @@ import type {
  * Uses only DB data — no live Yahoo Finance calls at read time.
  * Current prices are sourced from the latest TickerHistory close price.
  *
+ * @param currency - Optional currency for display: "ARS" converts all values server-side
  * @returns Portfolio summary with liquidity, total value, P&L, and holdings
  */
-export async function getSummary(): Promise<PortfolioSummary> {
-  return http.get<PortfolioSummary>('/api/portfolio/summary')
+export async function getSummary(currency?: string): Promise<PortfolioSummary> {
+  const params: Record<string, string> = {}
+  if (currency) params['currency'] = currency
+  return http.get<PortfolioSummary>('/api/portfolio/summary', params)
 }
 
 /**

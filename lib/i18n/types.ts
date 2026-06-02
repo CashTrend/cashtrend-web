@@ -59,6 +59,8 @@ export interface Translation {
     open_positions: string
     holding_singular: string
     holding_plural: string
+    show_ars: string
+    show_usd: string
     error: string
   }
   portfolio: {

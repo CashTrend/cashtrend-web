@@ -177,7 +177,7 @@ export default function TickersPage() {
                   <span className="rounded-md bg-surface-raised px-2 py-0.5 text-xs font-medium text-text-muted">
                     {ticker.market}
                   </span>
-                  {ticker.type === 'CEDEAR' && (
+                  {ticker.is_cedear && (
                     <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                       CEDEAR
                     </span>

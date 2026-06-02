@@ -21,6 +21,7 @@ import {
   getTickerBalance,
   getTickerCashflow,
   markAsCedear,
+  unmarkAsCedear,
 } from '@/services/tickers.service'
 import { RatiosTab } from '@/components/tickers/RatiosTab'
 import { HistoryTab } from '@/components/tickers/HistoryTab'
@@ -101,6 +102,8 @@ export default function TickerDetailPage() {
   const [cedearRatio, setCedearRatio] = useState('')
   const [cedearLoading, setCedearLoading] = useState(false)
   const [cedearError, setCedearError] = useState('')
+  const [unmarkLoading, setUnmarkLoading] = useState(false)
+  const [unmarkError, setUnmarkError] = useState('')
 
   // ── Built inside component to access t ──
   const TABS: { id: TabId; label: string }[] = [
@@ -199,8 +202,6 @@ export default function TickerDetailPage() {
     setCedearError('')
     try {
       const updated = await markAsCedear(symbol, ratio)
-      // Patch the in-memory detail with the updated ticker data so the badge
-      // and conversion ratio appear immediately without a full page reload.
       setPageData((prev) =>
         prev
           ? {
@@ -215,6 +216,27 @@ export default function TickerDetailPage() {
       setCedearError('Error al guardar. Intentá de nuevo.')
     } finally {
       setCedearLoading(false)
+    }
+  }
+
+  // ── Unmark ticker as CEDEAR ──────────────────────────────────────────────────
+  async function handleUnmarkCedear() {
+    setUnmarkLoading(true)
+    setUnmarkError('')
+    try {
+      const updated = await unmarkAsCedear(symbol)
+      setPageData((prev) =>
+        prev
+          ? {
+              ...prev,
+              detail: { ...prev.detail, ...updated, tickerratios_set: prev.detail.tickerratios_set },
+            }
+          : prev
+      )
+    } catch {
+      setUnmarkError('Error al quitar CEDEAR.')
+    } finally {
+      setUnmarkLoading(false)
     }
   }
 
@@ -311,8 +333,7 @@ export default function TickerDetailPage() {
           <div className="flex flex-wrap items-baseline gap-2">
             <h1 className="text-xl font-bold text-text-primary">{detail.symbol}</h1>
             <span className="text-sm text-text-secondary">{detail.name}</span>
-            {/* CEDEAR badge — shown when the ticker has been marked as a CEDEAR */}
-            {detail.type === 'CEDEAR' && (
+            {detail.is_cedear && (
               <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                 CEDEAR
               </span>
@@ -325,8 +346,7 @@ export default function TickerDetailPage() {
             </p>
           )}
 
-          {/* Conversion ratio — only for CEDEARs */}
-          {detail.type === 'CEDEAR' && detail.conversion_ratio && (
+          {detail.is_cedear && detail.conversion_ratio && (
             <p className="text-xs text-text-muted">
               Ratio de conversión:{' '}
               <span className="font-semibold text-text-secondary">{detail.conversion_ratio}:1</span>
@@ -340,27 +360,39 @@ export default function TickerDetailPage() {
             </p>
           )}
 
-          {/* ── Mark as CEDEAR section ── */}
-          <div className="mt-2">
+          {/* ── CEDEAR actions ── */}
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => {
                 setCedearFormOpen((open) => !open)
                 setCedearError('')
-                // Pre-fill with current ratio if already a CEDEAR
                 if (!cedearFormOpen && detail.conversion_ratio) {
                   setCedearRatio(detail.conversion_ratio)
                 }
               }}
               className="text-xs text-brand underline-offset-2 hover:underline"
             >
-              {detail.type === 'CEDEAR' ? 'Editar ratio CEDEAR' : 'Marcar como CEDEAR'}
+              {detail.is_cedear ? 'Editar ratio CEDEAR' : 'Marcar como CEDEAR'}
             </button>
+
+            {detail.is_cedear && (
+              <button
+                type="button"
+                onClick={handleUnmarkCedear}
+                disabled={unmarkLoading}
+                className="text-xs text-loss underline-offset-2 hover:underline disabled:opacity-50"
+              >
+                {unmarkLoading ? 'Quitando…' : 'Quitar CEDEAR'}
+              </button>
+            )}
+
+            {unmarkError && <p className="text-xs text-loss">{unmarkError}</p>}
 
             {cedearFormOpen && (
               <form
                 onSubmit={handleMarkCedear}
-                className="mt-2 flex max-w-xs flex-col gap-2 rounded-lg border border-border bg-surface-raised p-3"
+                className="mt-2 flex w-full max-w-xs flex-col gap-2 rounded-lg border border-border bg-surface-raised p-3"
               >
                 <label className="text-xs font-medium text-text-secondary">
                   Ratio de conversión

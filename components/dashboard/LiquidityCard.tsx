@@ -19,10 +19,12 @@ import { formatCurrency, getPnlDirection } from '@/lib/utils'
 interface LiquidityCardProps {
   /** Decimal string from PortfolioSummary.total_liquidity */
   liquidity: string
+  /** ISO 4217 currency code for display (default 'USD') */
+  currency?: string
   className?: string
 }
 
-export function LiquidityCard({ liquidity, className }: LiquidityCardProps) {
+export function LiquidityCard({ liquidity, currency = 'USD', className }: LiquidityCardProps) {
   const direction = getPnlDirection(liquidity)
 
   const valueColorClass =
@@ -47,7 +49,7 @@ export function LiquidityCard({ liquidity, className }: LiquidityCardProps) {
 
       {/* Value */}
       <p className={cn('text-2xl font-bold tabular-nums', valueColorClass)}>
-        {formatCurrency(liquidity)}
+        {formatCurrency(liquidity, currency)}
       </p>
 
       {/* Description */}

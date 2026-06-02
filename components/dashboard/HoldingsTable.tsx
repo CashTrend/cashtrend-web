@@ -28,23 +28,6 @@ interface HoldingsTableProps {
 const TH = 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary'
 const TD = 'px-4 py-3 text-sm tabular-nums text-text-primary'
 
-/**
- * Format a price value according to its currency.
- *
- * USD prices use standard currency formatting ("$1,234.56").
- * ARS prices show the number with an "ARS" label since the "$" symbol is
- * ambiguous between USD and Argentine pesos — this avoids confusion in a
- * mixed-currency portfolio.
- */
-function formatPrice(value: string | null | undefined, currency: string): string {
-  if (value === null || value === undefined || value === '') return '—'
-  if (currency === 'ARS') {
-    const formatted = formatNumber(value, 2)
-    return formatted === '—' ? '—' : `${formatted} ARS`
-  }
-  return formatCurrency(value)
-}
-
 export function HoldingsTable({ holdings, className }: HoldingsTableProps) {
   if (holdings.length === 0) {
     return (
@@ -97,8 +80,7 @@ export function HoldingsTable({ holdings, className }: HoldingsTableProps) {
                   <Link href={`/tickers/${h.symbol}`} className="group flex flex-col">
                     <span className="flex items-center gap-1.5 font-semibold text-brand group-hover:underline">
                       {h.symbol}
-                      {/* CEDEAR badge — shown when holding is an ARS-denominated certificate */}
-                      {h.currency === 'ARS' && (
+                      {h.is_cedear && (
                         <span className="rounded bg-amber-100 px-1 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                           CEDEAR
                         </span>
@@ -111,17 +93,9 @@ export function HoldingsTable({ holdings, className }: HoldingsTableProps) {
                 {/* Quantity */}
                 <td className={cn(TD, 'text-right')}>{formatNumber(h.net_quantity, 4)}</td>
 
-                {/* Avg buy price — in the ticker's native currency (ARS or USD) */}
-                <td className={cn(TD, 'text-right')}>{formatPrice(h.avg_buy_price, h.currency)}</td>
-
-                {/* Total invested — native currency (ARS for CEDEARs; USD for others).
-                    When the FX rate is available the backend converts ARS to USD, but
-                    using formatPrice keeps the label consistent with the actual currency
-                    the position was opened in, avoiding false USD formatting. */}
-                <td className={cn(TD, 'text-right')}>{formatPrice(h.total_invested, h.currency)}</td>
-
-                {/* Current price — in the ticker's native currency (ARS or USD) */}
-                <td className={cn(TD, 'text-right')}>{formatPrice(h.current_price, h.currency)}</td>
+                <td className={cn(TD, 'text-right')}>{formatCurrency(h.avg_buy_price)}</td>
+                <td className={cn(TD, 'text-right')}>{formatCurrency(h.total_invested)}</td>
+                <td className={cn(TD, 'text-right')}>{formatCurrency(h.current_price)}</td>
 
                 {/* Current value — always in USD */}
                 <td className={cn(TD, 'text-right')}>{formatCurrency(h.current_value)}</td>

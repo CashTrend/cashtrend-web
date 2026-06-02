@@ -14,13 +14,14 @@ export interface TransactionTicker {
   name: string
   type: string
   market: string
-  /** Currency in which the ticker's prices are denominated ('USD' or 'ARS'). */
   currency: string
   /**
    * How many CEDEAR units represent one underlying foreign share.
    * Null for non-CEDEAR tickers. Decimal as string.
    */
   conversion_ratio: string | null
+  /** True when this ticker is a CEDEAR. */
+  is_cedear: boolean
 }
 
 /** A transaction as returned by the API (read shape). */
@@ -81,11 +82,6 @@ export interface TransactionListParams {
 export interface Holding {
   symbol: string
   ticker_name: string
-  /**
-   * Currency in which avg_buy_price and current_price are denominated ('USD' or 'ARS').
-   * Portfolio totals (total_invested, current_value, pnl_amount) are always in USD.
-   */
-  currency: string
   /** Decimal as string. */
   net_quantity: string
   /** Weighted average buy price. Decimal as string. */
@@ -100,6 +96,8 @@ export interface Holding {
   pnl_amount: string | null
   /** (pnl_amount / total_invested) × 100. Decimal as string or null. */
   pnl_percent: string | null
+  /** True when this holding's ticker is a CEDEAR. */
+  is_cedear: boolean
 }
 
 /** Full portfolio summary returned by GET /api/portfolio/summary. */
